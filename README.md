@@ -22,7 +22,7 @@ Install library yang diperlukan
 
 Jalankan Servernya
 ```bash
-  npm run start
+  npm start
 ```
 
 Selesai.
