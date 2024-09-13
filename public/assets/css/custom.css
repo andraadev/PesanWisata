@@ -1,0 +1,52 @@
+body {
+    font-weight: bold;
+    /* Teks pada konten diberi warna putih */
+    color: white;
+
+    background-image: url('https://images.unsplash.com/photo-1440558929809-1412944a6225?q=80&w=1329&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+
+    /* Ukuran gambarnya menyesuaikan dengan ukuran kontainernya */
+    background-size: cover;
+
+    /* Posisi background di tengah */
+    background-position: center;
+
+    /* Untuk mencegah pengulangan gambar */
+    background-repeat: no-repeat;
+
+}
+
+/* Khusus untuk halaman beranda saja */
+.no-scrollbar{
+    /* sembunyikan scrollbar */
+    overflow-y: hidden;
+}
+
+
+/* Navbar */
+nav {
+    /* Memberikan warna transparan pada navbar */
+    background: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.jumbotron {
+    /* Memberikan jarak sebesar minimal 80vh dari atas */
+    min-height: 80vh;
+
+    /* Set agar elemen di jumbotron menggunakan aturan flexbox */
+    display: flex;
+
+    /* Mengatur elemen di dalam jumbotron menjadi kolom (1 teks 1 kolom) */
+    flex-direction: column;
+
+    /* Menyelaraskan konten di tengah secara vertikal */
+    justify-content: center;
+
+    /* Menyelaraskan konten di tengah secara horizontal */
+    align-items: center;
+}
