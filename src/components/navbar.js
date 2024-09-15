@@ -20,7 +20,7 @@ const Navbar = () => {
                     <Link to="/destinasi" class="nav-link text-white" aria-current="page" >Destinasi Wisata</Link>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="data_booking.html">Data Booking</a>
+                    <Link to="/data-booking" class="nav-link text-white">Data Booking</Link>
                 </li>
             </ul>
             <div class="button-wrapper d-flex gap-2">
@@ -30,7 +30,7 @@ const Navbar = () => {
         </div>
         </div>
 </nav>
-    )
+)
 };
 
 export default Navbar;
