@@ -12,12 +12,12 @@ const EditUser = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('token');
+    //   const token = localStorage.getItem('token');
       try {
         const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        //   headers: {
+        //     // 'Authorization': `Bearer ${token}`
+        //   }
         });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -42,14 +42,14 @@ const EditUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    // const token = localStorage.getItem('token');
     try {
       const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // //   'Authorization': `Bearer ${token}`
+        // },
         body: JSON.stringify(user)
       });
       if (!response.ok) {
