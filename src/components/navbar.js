@@ -24,8 +24,8 @@ const Navbar = () => {
                 </li>
             </ul>
             <div class="button-wrapper d-flex gap-2">
-                <Link to="auth/login.html" class="btn btn-primary">Masuk</Link>
-                <Link to="auth/register.html" class="btn btn-light">Daftar</Link>
+                <Link to="/login" class="btn btn-primary">Masuk</Link>
+                <Link to="/register" class="btn btn-light">Daftar</Link>
             </div>
         </div>
         </div>
