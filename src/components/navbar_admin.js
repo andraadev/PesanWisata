@@ -1,10 +1,12 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const NavbarAdmin = () => {
-<>
+return (
+<div>
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="index.html">
+        <a class="navbar-brand text-white" href="admin/beranda">
             PesanWisata
             <span class="badge text-bg-primary">Admin</span>
         </a>
@@ -13,18 +15,18 @@ const NavbarAdmin = () => {
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="./index.html">Beranda</a>
+                    <Link class="nav-link active text-white" aria-current="page" to="/beranda">Beranda</Link>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" aria-current="page" href="users/index.html">Data User</a>
+                    <Link class="nav-link text-white" aria-current="page" to="/data-user">Data User</Link>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="destinations/index.html">Data Destinasi</a>
+                    <Link class="nav-link text-white" to="">Data Destinasi</Link>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="bookings/index.html">Data Booking</a>
+                    <Link class="nav-link text-white" to="">Data Booking</Link>
                 </li>
             </ul>
             <div class="button-wrapper d-flex">
@@ -33,7 +35,8 @@ const NavbarAdmin = () => {
         </div>
         </div>
 </nav>
-</>
+</div>
+)
 };
 
 export default NavbarAdmin;

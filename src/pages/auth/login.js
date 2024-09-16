@@ -25,7 +25,7 @@ const Login = () => {
                 localStorage.setItem('token', data.token);
                 alert('Login sebagai admin berhasil!')
                 // redirect ke halaman beranda Admin
-                navigate('/admin/beranda');
+                navigate('/data-user');
             } else {
                 setError(data.message || 'Login Gagal');
             }

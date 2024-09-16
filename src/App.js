@@ -5,6 +5,11 @@ import Home from './pages';
 import DestinasiWisata from './pages/destinasi_wisata';
 import Register from './pages/auth/register';
 import Login from './pages/auth/login';
+import BerandaAdmin from './pages/admin';
+import ProtectedRoutes from './middleware/PrivateRoute';
+import DataUser from './pages/admin/users';
+import TambahDataUser from './pages/admin/users/add';
+import EditDataUser from './pages/admin/users/update';
 
 function App() {
   return (
@@ -14,6 +19,10 @@ function App() {
         <Route path="/destinasi" element={<DestinasiWisata/>} />
         <Route path="/register" element={<Register/>}/>
         <Route path="/login" element={<Login/>}/>
+        <Route path="/beranda" element={<BerandaAdmin/>} />
+        <Route path="/data-user" element={<DataUser/>} />
+        <Route path="/tambah-user" element={<TambahDataUser/>} />
+        <Route path="/edit-user/:id" element={<EditDataUser/>} />
       </Routes>
     </Router>
   );
