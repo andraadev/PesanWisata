@@ -58,9 +58,15 @@ const Booking = () => {
     e.preventDefault();
     setError(null);
 
+    console.log("Data yang diinputkan:", formData);
+
     const formDataSubmit = new FormData();
     Object.keys(formData).forEach(key => {
-      formDataSubmit.append(key, formData[key]);
+      if (key === "user_id" || key === "destination_id") {
+        formDataSubmit.append(key, parseInt(formData[key]) || 0);
+      } else {
+        formDataSubmit.append(key, formData[key]);
+      }
     });
 
     try {
@@ -68,30 +74,47 @@ const Booking = () => {
         method: "POST",
         body: formDataSubmit,
       });
+
       if (!response.ok) {
-        throw new Error(`HTTP Error | Status ${response.status}`);
+        const errorData = await response.json();
+        if (response.status === 422) {
+          // Handle validation errors
+          setError(`Error 422: ${errorData.message || 'Tanggal Booking Wajib Diisi!'}`);
+        } else if (response.status === 500) {
+          // Handle server errors
+          setError('Error 500: Terjadi Masalah di Sisi Server');
+        } else {
+          setError(`HTTP Error | Status ${response.status}: ${response.statusText}`);
+        }
+        return;
       }
+
       alert('Booking berhasil ditambahkan');
       navigate('/data-booking');
     } catch (error) {
-      setError(error.message);
+      setError(`Network Error: ${error.message}`);
     }
   };
 
   return (
     <div>
       <Navbar />
-      <main class="container content-wrapper" style={{ minHeight: "80vh" }}>
-        <h1 class="text-shadow">Booking</h1>
-        <form onSubmit={handleSubmit} class="form-wrapper card p-4">
-          <div class="row mb-3">
-            <div class="col-sm-12 col-md-6">
-              <label for="booking_date" class="form-label">Tanggal Booking</label>
-              <input type="date" name="booking_date" id="booking_date" class="form-control" value={formData.booking_date} onChange={handleChange} />
+      <main className="container content-wrapper" style={{ minHeight: "80vh" }}>
+        <h1 className="text-shadow">Booking</h1>
+        {error && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="form-wrapper card p-4">
+          <div className="row mb-3">
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="booking_date" className="form-label">Tanggal Booking</label>
+              <input type="date" name="booking_date" id="booking_date" className="form-control" value={formData.booking_date} onChange={handleChange} />
             </div>
-            <div class="col-sm-12 col-md-6">
-              <label for="nama" class="form-label">Nama Kamu</label>
-              <select name="user_id" class="form-select" id="nama" value={formData.user_id} onChange={handleChange}>
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="nama" className="form-label">Nama Kamu</label>
+              <select name="user_id" className="form-select" id="nama" value={formData.user_id} onChange={handleChange}>
                 <option value="">Pilih User</option>
                 {users.length > 0 ? (
                   users.map(user => (
@@ -105,28 +128,28 @@ const Booking = () => {
               </select>
             </div>
           </div>
-          <div class="row mb-3">
-            <div class="col-sm-12 col-md-6">
-              <label for="destinasi_tujuan" class="form-label">Destinasi Tujuan</label>
-              <select name="destination_id" class="form-select" value={formData.destination_id} onChange={handleChange}>
+          <div className="row mb-3">
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="destinasi_tujuan" className="form-label">Destinasi Tujuan</label>
+              <select name="destination_id" className="form-select" value={formData.destination_id} onChange={handleChange}>
+                <option value="">Pilih Destinasi</option>
                 {destination ? (
                   <option value={destination.id} key={destination.id}>
                     {destination.name}
                   </option>
                 ) : (
-                  <option value="">Destinasi Tidak Tersedia </option>
+                  <option value="">Loading...</option>
                 )}
               </select>
             </div>
-            <div class="col-sm-12 col-md-6">
-              <label for="status" class="form-label">Status</label><br />
-              <input type="radio" name="status" id="status" checked={formData.status === "Selesai"} class="form-check-input" value={formData.status} onChange={handleChange} />
-              <label for="status">Selesai</label>
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="status" className="form-label">Status</label><br />
+              <input type="radio" name="status" id="status" checked={formData.status === "Selesai"} className="form-check-input" value={formData.status} onChange={handleChange} />
+              <label htmlFor="status">Selesai</label>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" className="btn btn-primary">Submit</button>
         </form>
-        {error && <p class="text-danger mt-3">{error}</p>}
       </main>
       <Footer />
     </div>
