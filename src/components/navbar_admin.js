@@ -23,10 +23,7 @@ return (
                     <Link class="nav-link text-white" aria-current="page" to="/data-user">Data User</Link>
                 </li>
                 <li class="nav-item">
-                    <Link class="nav-link text-white" to="">Data Destinasi</Link>
-                </li>
-                <li class="nav-item">
-                    <Link class="nav-link text-white" to="">Data Booking</Link>
+                    <Link class="nav-link text-white" to="/data-destinasi">Data Destinasi</Link>
                 </li>
             </ul>
             <div class="button-wrapper d-flex">

@@ -46,10 +46,10 @@ const EditUser = () => {
     try {
       const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
         method: 'PUT',
-        // headers: {
-        //   'Content-Type': 'application/json',
-        // //   'Authorization': `Bearer ${token}`
-        // },
+        headers: {
+          'Content-Type': 'application/json',
+        //   'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(user)
       });
       if (!response.ok) {

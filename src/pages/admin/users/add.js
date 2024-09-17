@@ -49,7 +49,7 @@ const TambahDataUser = () => {
             } else if (response.status === 422) {
                 setError(data);
             } else {
-                setError(data.message || 'Registrasi Gagal');
+                setError(data.message || 'User Baru Gagal Ditambahkan');
             }
         } catch (error) {
             setError(error.message);

@@ -10,6 +10,9 @@ import ProtectedRoutes from './middleware/PrivateRoute';
 import DataUser from './pages/admin/users';
 import TambahDataUser from './pages/admin/users/add';
 import EditDataUser from './pages/admin/users/update';
+import DataDestinasi from './pages/admin/destinations';
+import TambahDestinasi from './pages/admin/destinations/add';
+import EditDataDestinasi from './pages/admin/destinations/update';
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
         <Route path="/data-user" element={<DataUser/>} />
         <Route path="/tambah-user" element={<TambahDataUser/>} />
         <Route path="/edit-user/:id" element={<EditDataUser/>} />
+        <Route path="/data-destinasi" element={<DataDestinasi/>} />
+        <Route path="/tambah-destinasi" element={<TambahDestinasi/>} />
+        <Route path="/edit-destinasi/:id" element={<EditDataDestinasi/>} />
       </Routes>
     </Router>
   );

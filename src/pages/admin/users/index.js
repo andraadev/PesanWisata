@@ -86,13 +86,13 @@ return(
 // Fungsi untuk menangani penghapusan
 async function handleDelete(id) {
     if (window.confirm('Apakah anda yakin? Tindakan ini mungkin memengaruhi data user ini di tabel lain.')) {
-      const token = localStorage.getItem('token');
+    //   const token = localStorage.getItem('token');
       try {
         const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        //   headers: {
+        //     'Authorization': `Bearer ${token}`
+        //   }
         });
         if (!response.ok) {
           throw new Error(`HTTP error ! Status: ${response.status}`);
