@@ -6,7 +6,6 @@ import DestinasiWisata from './pages/destinasi_wisata';
 import Register from './pages/auth/register';
 import Login from './pages/auth/login';
 import BerandaAdmin from './pages/admin';
-import ProtectedRoutes from './middleware/PrivateRoute';
 import DataUser from './pages/admin/users';
 import TambahDataUser from './pages/admin/users/add';
 import EditDataUser from './pages/admin/users/update';
