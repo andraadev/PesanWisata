@@ -1,91 +1,159 @@
-<!DOCTYPE html>
-<html lang="en">
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import Footer from "../components/footer";
+import Navbar from "../components/navbar";
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+const Booking = () => {
+  const { slug } = useParams(); // Mengambil slug dari URL
+  const [users, setUsers] = useState([]); // State untuk menyimpan data user
+  const [destination, setDestination] = useState(null); // State untuk menyimpan data destinasi
+  const [formData, setFormData] = useState({
+    booking_date: '',
+    user_id: '',
+    destination_id: '',
+    status: 'Selesai'
+  });
+  const [error, setError] = useState(null); // State untuk menyimpan pesan error
+  const navigate = useNavigate();
 
-    <title>Booking | PesanWisata App</title>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch data dari API users
+        const usersResponse = await fetch('http://localhost:8000/api/users');
+        const usersData = await usersResponse.json();
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+        // Cek apakah response valid
+        if (usersData.status && Array.isArray(usersData.data)) {
+          setUsers(usersData.data);
+        } else {
+          console.error('Invalid users response format:', usersData);
+        }
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="./assets/css/custom.css">
-</head>
+        // Fetch data destinasi berdasarkan slug
+        const destinationResponse = await fetch(`http://localhost:8000/api/destinations/${slug}`);
+        const destinationData = await destinationResponse.json();
 
-<body>
-    <!-- Awal Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand text-white" href="index.html">PesanWisata</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
-                    <li class="nav-item">
-                        <a class="nav-link active text-white" aria-current="page" href="index.html">Beranda</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" aria-current="page" href="destinasi_wisata.html">Destinasi
-                            Wisata</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="data_booking.html">Data Booking</a>
-                    </li>
-                </ul>
-                <div class="button-wrapper d-flex gap-2">
-                    <a href="auth/login.html" class="btn btn-primary">Masuk</a>
-                    <a href="auth/register.html" class="btn btn-light">Daftar</a>
-                </div>
+        // Cek apakah response destinasi valid
+        if (destinationData.success && destinationData.data) {
+          setDestination(destinationData.data); // Simpan data destinasi di state
+        } else {
+          console.error('Invalid destination response format:', destinationData);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to fetch data.');
+      }
+    };
+
+    fetchData(); // Panggil fetchData saat komponen di-mount
+  }, [slug]); // Mengatur dependensi untuk memuat ulang jika slug berubah
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    console.log("Data yang diinputkan:", formData);
+
+    const formDataSubmit = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (key === "user_id" || key === "destination_id") {
+        formDataSubmit.append(key, parseInt(formData[key]) || 0);
+      } else {
+        formDataSubmit.append(key, formData[key]);
+      }
+    });
+
+    try {
+      const response = await fetch('http://localhost:8000/api/booking', {
+        method: "POST",
+        body: formDataSubmit,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 422) {
+          // Handle validation errors
+          setError(`Error 422: ${errorData.message || 'Tanggal Booking Wajib Diisi!'}`);
+        } else if (response.status === 500) {
+          // Handle server errors
+          setError('Error 500: Terjadi Masalah di Sisi Server');
+        } else {
+          setError(`HTTP Error | Status ${response.status}: ${response.statusText}`);
+        }
+        return;
+      }
+
+      alert('Booking berhasil ditambahkan');
+      navigate('/data-booking');
+    } catch (error) {
+      setError(`Network Error: ${error.message}`);
+    }
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <main className="container content-wrapper" style={{ minHeight: "80vh" }}>
+        <h1 className="text-shadow">Booking</h1>
+        {error && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="form-wrapper card p-4">
+          <div className="row mb-3">
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="booking_date" className="form-label">Tanggal Booking</label>
+              <input type="date" name="booking_date" id="booking_date" className="form-control" value={formData.booking_date} onChange={handleChange} />
             </div>
-    </nav>
-    <!-- Akhir Bagian Navbar -->
-
-    <!-- Awal Bagian Konten -->
-    <main class="container content-wrapper" style="min-height: 80vh;">
-        <h1 class="text-shadow">Booking</h1> 
-        <form action="#" method="POST" class="form-wrapper card p-4">
-            <input type="hidden" name="user_id" value="">
-            <input type="hidden" name="destination_id" value="">
-            <div class="row mb-3">
-                <div class="col-sm-12 col-md-6">
-                    <label for="nama" class="form-label">Nama Kamu</label>
-                    <input type="text" class="form-control" id="nama" value="" disabled>
-                </div>
-                <div class="col-sm-12 col-md-6">
-                    <label for="destinasi_tujuan" class="form-label">Destinasi Tujuan</label>
-                    <input type="text" name="destinasi_tujuan" id="nama" class="form-control" value="" disabled>
-                </div>
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="nama" className="form-label">Nama Kamu</label>
+              <select name="user_id" className="form-select" id="nama" value={formData.user_id} onChange={handleChange}>
+                <option value="">Pilih User</option>
+                {users.length > 0 ? (
+                  users.map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">Loading...</option>
+                )}
+              </select>
             </div>
-            <div class="row mb-3">
-                <div class="col-sm-12 col-md-6">
-                    <label for="booking_date" class="form-label">Tanggal Booking</label>
-                    <input type="date" name="booking_date" id="booking_date" class="form-control">
-                </div>
-                <div class="col-sm-12 col-md-6">
-                    <label for="status" class="form-label">Status</label><br>
-                    <input type="radio" name="status" id="status" checked class="form-check-input">
-                    <label for="status">Selesai</label>
-                </div>
+          </div>
+          <div className="row mb-3">
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="destinasi_tujuan" className="form-label">Destinasi Tujuan</label>
+              <select name="destination_id" className="form-select" value={formData.destination_id} onChange={handleChange}>
+                <option value="">Pilih Destinasi</option>
+                {destination ? (
+                  <option value={destination.id} key={destination.id}>
+                    {destination.name}
+                  </option>
+                ) : (
+                  <option value="">Loading...</option>
+                )}
+              </select>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div className="col-sm-12 col-md-6">
+              <label htmlFor="status" className="form-label">Status</label><br />
+              <input type="radio" name="status" id="status" checked={formData.status === "Selesai"} className="form-check-input" value={formData.status} onChange={handleChange} />
+              <label htmlFor="status">Selesai</label>
+            </div>
+          </div>
+          <button type="submit" className="btn btn-primary">Submit</button>
         </form>
-    </main>
-    <!-- Akhir Bagian Konten -->
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
-    <!-- Awal Bagian Footer -->
-    <footer class="text-center">
-        <p>© 2024, PesanWisata App. All rights reserved </p>
-    </footer>
-    <!-- Akhir Bagian Footer -->
-
-    <!-- Bootstrap JS -->
-    <script src="./assets/js/bootstrap.min.js"></script>
-</body>
-
-</html>
+export default Booking;

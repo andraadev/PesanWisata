@@ -12,6 +12,8 @@ import EditDataUser from './pages/admin/users/update';
 import DataDestinasi from './pages/admin/destinations';
 import TambahDestinasi from './pages/admin/destinations/add';
 import EditDataDestinasi from './pages/admin/destinations/update';
+import DataBooking from './pages/data_booking';
+import Booking from './pages/booking';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
         <Route path="/data-destinasi" element={<DataDestinasi/>} />
         <Route path="/tambah-destinasi" element={<TambahDestinasi/>} />
         <Route path="/edit-destinasi/:id" element={<EditDataDestinasi/>} />
+        <Route path="/booking/:slug" element={<Booking/>} />
+        <Route path="/data-booking" element={<DataBooking/>} />
       </Routes>
     </Router>
   );
