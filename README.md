@@ -58,10 +58,10 @@ Built on React 18 and React Router DOM v6, the application utilizes declarative 
 
 ## 👥 User Roles
 
-| Role                    | Responsibilities                                                                                                        |
-| :---------------------- | :---------------------------------------------------------------------------------------------------------------------- |
-| ** Traveler / Visitor** | Browse tourist destinations, view attraction details, book destination tickets, and view booking summaries.             |
-| ** Administrator**      | Access admin dashboard, perform CRUD operations on destinations, manage user accounts, and monitor booking submissions. |
+| Role                   | Responsibilities                                                                                                        |
+| :--------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| **Traveler / Visitor** | Browse tourist destinations, view attraction details, book destination tickets, and view booking summaries.             |
+| **Administrator**      | Access admin dashboard, perform CRUD operations on destinations, manage user accounts, and monitor booking submissions. |
 
 ---
 
