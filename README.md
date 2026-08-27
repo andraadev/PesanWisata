@@ -91,7 +91,15 @@ The following describes the primary workflows and user journeys supported across
 
 ---
 
-## 📦 Packages
+## � Backend API
+
+This frontend application works with the following API:
+
+- **PesanWisata API** - [https://github.com/andraadev/pesanwisata-api](https://github.com/andraadev/pesanwisata-api)
+
+---
+
+## �📦 Packages
 
 | Package                                                  | Purpose                                                | Status  |
 | :------------------------------------------------------- | :----------------------------------------------------- | :------ |
