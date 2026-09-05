@@ -1,13 +1,13 @@
 <div align="center">
 
-# PesanWisata App (Frontend)
+# PesanWisata
 
 A React-based tourism booking and management web application with role-based navigation, destination catalog, ticket booking flows, and an administrative dashboard for user and destination management.
 
-[![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![React Router](https://img.shields.io/badge/React_Router-6.26.2-CA4245?style=for-the-badge&logo=react-router&logoColor=white)](https://reactrouter.com)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)](https://reactrouter.com)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 </div>
 
@@ -22,7 +22,7 @@ The application delivers a dual-interface experience:
 1. **Public/Traveler Interface**: Explore tourist destinations, review attraction details, calculate ticket costs, and complete bookings.
 2. **Admin Panel**: Manage master data including tourist destinations, user accounts, and review customer bookings.
 
-Built on React 18 and React Router DOM v6, the application utilizes declarative client-side routing, responsive Bootstrap layouts, and modular component design.
+Built on React and React Router DOM, the application utilizes declarative client-side routing, responsive Bootstrap layouts, and modular component design.
 
 ---
 
@@ -83,11 +83,9 @@ The following describes the primary workflows and user journeys supported across
 
 ## 🛠️ Tech Stack
 
-- **React.js 18.3.1**
-- **React Router DOM 6.26.2**
+- **React.js**
+- **React Router DOM**
 - **Bootstrap 5**
-- **HTML5 & Modern CSS3**
-- **React Scripts (CRA Tooling)**
 
 ---
 
@@ -96,19 +94,6 @@ The following describes the primary workflows and user journeys supported across
 This frontend application works with the following API:
 
 - **PesanWisata API** - [https://github.com/andraadev/pesanwisata-api](https://github.com/andraadev/pesanwisata-api)
-
----
-
-## �📦 Packages
-
-| Package                                                  | Purpose                                                | Status  |
-| :------------------------------------------------------- | :----------------------------------------------------- | :------ |
-| [react](https://react.dev/)                              | Core component-based UI library                        | Used ✅ |
-| [react-dom](https://react.dev/)                          | React DOM rendering engine                             | Used ✅ |
-| [react-router-dom](https://reactrouter.com/)             | Client-side routing and parameterized page navigation  | Used ✅ |
-| [react-scripts](https://create-react-app.dev/)           | Build toolchain, Webpack configuration, and scripts    | Used ✅ |
-| [@testing-library/react](https://testing-library.com/)   | React component unit and integration testing utilities | Used ✅ |
-| [web-vitals](https://github.com/GoogleChrome/web-vitals) | Core Web Vitals performance telemetry                  | Used ✅ |
 
 ---
 
@@ -150,24 +135,16 @@ This frontend application works with the following API:
 
 ```text
 pesanWisataApp-FE/
-├── public/                 # Static assets and HTML template
+├── public/
 └── src/
-    ├── components/         # Reusable UI components
-    │   ├── navbar.js       # Main public navigation bar
-    │   ├── navbar_admin.js # Admin dashboard navigation bar
-    │   └── footer.js       # Global footer component
-    ├── pages/              # Application page views
-    │   ├── admin/          # Admin management interfaces
-    │   │   ├── destinations/ # CRUD destination views (add, update, list)
-    │   │   ├── users/        # CRUD user management views (add, update, list)
-    │   │   └── index.js      # Admin dashboard home
-    │   ├── auth/           # Authentication pages (login, register)
-    │   ├── booking.js      # Ticket booking form page
-    │   ├── data_booking.js # Booking recap / overview page
-    │   ├── destinasi_wisata.js # Public destination catalog
-    │   └── index.js        # Public landing page
-    ├── App.js              # Route configurations
-    └── index.js            # React application entry point
+    ├── components/
+    ├── pages/
+    │   ├── admin/
+    │   │   ├── destinations/
+    │   │   └── users/
+    │   └── auth/
+    ├── App.jsx
+    └── index.jsx
 ```
 
 ---
