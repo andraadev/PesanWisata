@@ -66,14 +66,14 @@ const Register = () => {
     }
 
     return (
-        <div class="container mt-5" style={{ minHeight: "90vh" }}>
-            <Link to="/" class="btn btn-secondary">Kembali ke Halaman Utama</Link>
-            <h1 class="text-shadow">Register</h1>
-            <p class="text-shadow">Silakan masukkan nama, email, dan password untuk membuat akun baru.</p>
+        <div className="container mt-5" style={{ minHeight: "90vh" }}>
+            <Link to="/" className="btn btn-secondary">Kembali ke Halaman Utama</Link>
+            <h1 className="text-shadow">Register</h1>
+            <p className="text-shadow">Silakan masukkan nama, email, dan password untuk membuat akun baru.</p>
             
             {/* Alert Bootstrap untuk menampilkan semua error validasi */}
             {Object.keys(errors).length > 0 && (
-                <div class="alert alert-danger" role="alert">
+                <div className="alert alert-danger" role="alert">
                     <ul>
                         {/* Menampilkan error dari API di dalam list */}
                         {Object.keys(errors).map((key) => (
@@ -84,36 +84,36 @@ const Register = () => {
             )}
 
             {/* Form Registrasi */}
-            <form onSubmit={handleSubmit} class="card p-3">
-                <div class="row">
+            <form onSubmit={handleSubmit} className="card p-3">
+                <div className="row">
                     {/* Input untuk Nama */}
-                    <div class="col-sm-12 col-md-6 mb-3">
-                        <label for="nama_lengkap" class="form-label">Nama</label>
-                        <input type="text" name="name" id="nama_lengkap" class="form-control" value={formRegister.name} onChange={handleChange} autoFocus />
+                    <div className="col-sm-12 col-md-6 mb-3">
+                        <label for="nama_lengkap" className="form-label">Nama</label>
+                        <input type="text" name="name" id="nama_lengkap" className="form-control" value={formRegister.name} onChange={handleChange} autoFocus />
                     </div>
                     {/* Input untuk Email */}
-                    <div class="col-sm-12 col-md-6 mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" value={formRegister.email} onChange={handleChange} />
+                    <div className="col-sm-12 col-md-6 mb-3">
+                        <label for="email" className="form-label">Email</label>
+                        <input type="email" name="email" id="email" className="form-control" value={formRegister.email} onChange={handleChange} />
                     </div>
                 </div>
-                <div class="row">
+                <div className="row">
                     {/* Input untuk Password */}
-                    <div class="col-sm-12 col-md-6 mb-3">
-                        <label for="password" class="form-label">Kata Sandi</label>
-                        <input type="password" name="password" id="password" class="form-control" value={formRegister.password} onChange={handleChange} />
+                    <div className="col-sm-12 col-md-6 mb-3">
+                        <label for="password" className="form-label">Kata Sandi</label>
+                        <input type="password" name="password" id="password" className="form-control" value={formRegister.password} onChange={handleChange} />
                     </div>
                     {/* Input untuk Konfirmasi Password */}
-                    <div class="col-sm-12 col-md-6 mb-3">
-                        <label for="confirm_password" class="form-label">Konfirmasi Kata Sandi</label>
-                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" value={formRegister.confirm_password} onChange={handleChange} />
+                    <div className="col-sm-12 col-md-6 mb-3">
+                        <label for="confirm_password" className="form-label">Konfirmasi Kata Sandi</label>
+                        <input type="password" name="confirm_password" id="confirm_password" className="form-control" value={formRegister.confirm_password} onChange={handleChange} />
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Daftar</button>
+                <button type="submit" className="btn btn-primary">Daftar</button>
                 
                 {/* Menampilkan error global (jika ada) */}
                 {error && (
-                    <div class="alert alert-danger mt-3" role="alert">
+                    <div className="alert alert-danger mt-3" role="alert">
                         {error}
                     </div>
                 )}

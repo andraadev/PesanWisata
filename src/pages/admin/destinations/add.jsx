@@ -66,11 +66,11 @@ const TambahDestinasi = () => {
     return(
 <div>
     <NavbarAdmin/>
-    <main class="container content-wrapper">
-        <Link to="/data-destinasi" class="btn btn-secondary">Kembali ke Halaman Data Destinasi</Link>
-        <h1 class="text-shadow">Tambah Data Destinasi</h1>
-        <p class="text-shadow">Di halaman ini, kamu dapat mendaftarkan destinasi wisata baru.</p>
-        <div class="card p-4">
+    <main className="container content-wrapper">
+        <Link to="/data-destinasi" className="btn btn-secondary">Kembali ke Halaman Data Destinasi</Link>
+        <h1 className="text-shadow">Tambah Data Destinasi</h1>
+        <p className="text-shadow">Di halaman ini, kamu dapat mendaftarkan destinasi wisata baru.</p>
+        <div className="card p-4">
              {/* Alert Bootstrap untuk menampilkan semua error validasi */}
              {error && (
                         <div className="alert alert-danger" role="alert">
@@ -83,31 +83,31 @@ const TambahDestinasi = () => {
                         </div>
                     )}
             <form onSubmit={handleSubmit}>
-                <div class="row">
-                    <div id="input-group" class="col-sm-12 col-md-6 mb-3">
-                        <label for="nama" class="form-label">Nama</label>
-                        <input type="text" name="name" id="nama" class="form-control" value={formData.name} onChange={handleChange} autofocus/>
+                <div className="row">
+                    <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                        <label for="nama" className="form-label">Nama</label>
+                        <input type="text" name="name" id="nama" className="form-control" value={formData.name} onChange={handleChange} autofocus/>
                     </div>
-                    <div id="input-group" class="col-sm-12 col-md-6 mb-3">
-                        <label for="slug" class="form-label">Slug</label>
-                        <input type="text" name="slug" id="slug" class="form-control" value={formData.slug} onChange={handleChange}/>
-                    </div>
-                </div>
-                <div class="row">
-                    <div id="input-group" class="col-sm-12 col-md-6 mb-3">
-                        <label for="lokasi" class="form-label">Lokasi</label>
-                        <input type="text" name="location" id="lokasi" class="form-control" value={formData.location} onChange={handleChange}/>
-                    </div>
-                    <div id="input-group" class="col-sm-12 col-md-6 mb-3">
-                        <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea name="description" id="deskripsi" class="form-control" value={formData.description} onChange={handleChange}></textarea>
+                    <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                        <label for="slug" className="form-label">Slug</label>
+                        <input type="text" name="slug" id="slug" className="form-control" value={formData.slug} onChange={handleChange}/>
                     </div>
                 </div>
-                <div id="input-group" class="mb-3">
-                    <label for="gambar" class="form-label">Gambar</label>
-                    <input type="file" name="image_url" id="gambar" class="form-control" onChange={handleChange}/>
+                <div className="row">
+                    <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                        <label for="lokasi" className="form-label">Lokasi</label>
+                        <input type="text" name="location" id="lokasi" className="form-control" value={formData.location} onChange={handleChange}/>
+                    </div>
+                    <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                        <label for="deskripsi" className="form-label">Deskripsi</label>
+                        <textarea name="description" id="deskripsi" className="form-control" value={formData.description} onChange={handleChange}></textarea>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary mb-3">Submit</button>
+                <div id="input-group" className="mb-3">
+                    <label for="gambar" className="form-label">Gambar</label>
+                    <input type="file" name="image_url" id="gambar" className="form-control" onChange={handleChange}/>
+                </div>
+                <button type="submit" className="btn btn-primary mb-3">Submit</button>
             </form>
         </div>
     </main>
