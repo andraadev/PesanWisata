@@ -62,10 +62,10 @@ const EditUser = () => {
   };
 
   if(loading) 
-    return (<p class="text-center mt-5">Sedang mengambil data user berdasarkan ID...</p>)
+    return (<p className="text-center mt-5">Sedang mengambil data user berdasarkan ID...</p>)
     if(error)
       return (
-      <div class="alert alert-danger mt-5" role="alert">
+      <div className="alert alert-danger mt-5" role="alert">
       Error = {error}
       </div>
   )

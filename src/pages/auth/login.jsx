@@ -34,27 +34,27 @@ const Login = () => {
         }
     }
 return(
-<div class="container mt-5">
-<Link to="/" class="btn btn-secondary">Kembali ke Halaman Utama</Link>
-    <h1 class="text-shadow">Login</h1>
-    <p class="text-shadow">Silakan masukkan email kamu dan password untuk melanjutkan.</p>
+<div className="container mt-5">
+<Link to="/" className="btn btn-secondary">Kembali ke Halaman Utama</Link>
+    <h1 className="text-shadow">Login</h1>
+    <p className="text-shadow">Silakan masukkan email kamu dan password untuk melanjutkan.</p>
     {/* Menampilkan error global (jika ada) */}
     {error && (
-        <div class="alert alert-danger mt-3" role="alert">
+        <div className="alert alert-danger mt-3" role="alert">
             {error}
         </div>
     )}
-    <form onSubmit={handleLogin} class="card p-3">
-        <div id="input-group" class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" id="email" class="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+    <form onSubmit={handleLogin} className="card p-3">
+        <div id="input-group" className="mb-3">
+            <label for="email" className="form-label">Email</label>
+            <input type="email" name="email" id="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required/>
         </div>
-        <div id="input-group" class="mb-3">
-            <label for="password" class="form-label">Kata Sandi</label>
-            <input type="password" name="password" id="password" class="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required/>
+        <div id="input-group" className="mb-3">
+            <label for="password" className="form-label">Kata Sandi</label>
+            <input type="password" name="password" id="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required/>
         </div>
-        <button type="submit" class="btn btn-primary">Masuk</button>
-        <p class="register-account text-center mt-3">
+        <button type="submit" className="btn btn-primary">Masuk</button>
+        <p className="register-account text-center mt-3">
             Tidak memiliki akun? <Link to="/register">Buat akun baru</Link> untuk memulai.
         </p>
     </form>

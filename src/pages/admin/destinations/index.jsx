@@ -37,22 +37,22 @@ const DataDestinasi = () => {
         fetchDestination();
       }, []);
       if(loading) 
-      return (<p class="text-center mt-5">Sedang mengambil data destinasi...</p>)
+      return (<p className="text-center mt-5">Sedang mengambil data destinasi...</p>)
       if(error)
         return (
-        <div class="alert alert-danger mt-5" role="alert">
+        <div className="alert alert-danger mt-5" role="alert">
         Error = {error}
         </div>
     )
     return(
         <div>
     <NavbarAdmin />
-    <main class="container content-wrapper">
-        <h1 class="text-shadow">Data Destinasi</h1>
-        <p class="text-shadow">Di halaman ini, kamu dapat melihat destinasi wisata yang sudah terdaftar.</p>
-        <div class="card p-4 table-responsive">
-            <Link to="/tambah-destinasi" class="btn btn-primary mb-3">Tambah</Link>
-            <table class="table table-bordered">
+    <main className="container content-wrapper">
+        <h1 className="text-shadow">Data Destinasi</h1>
+        <p className="text-shadow">Di halaman ini, kamu dapat melihat destinasi wisata yang sudah terdaftar.</p>
+        <div className="card p-4 table-responsive">
+            <Link to="/tambah-destinasi" className="btn btn-primary mb-3">Tambah</Link>
+            <table className="table table-bordered">
                 <thead>
                     <tr>
                         <th scope="col">No</th>
@@ -74,8 +74,8 @@ const DataDestinasi = () => {
                         <td>{destination.description}</td>
                         <td>-</td>
                         <td>
-                            <Link to={`/edit-destinasi/${destination.id}`} class="btn btn-warning text-dark">Edit</Link>
-                            <a href="#" class="btn btn-danger" onClick={() => handleDelete(destination.id)}>Hapus</a>
+                            <Link to={`/edit-destinasi/${destination.id}`} className="btn btn-warning text-dark">Edit</Link>
+                            <a href="#" className="btn btn-danger" onClick={() => handleDelete(destination.id)}>Hapus</a>
                         </td>
                     </tr>
                     ))}

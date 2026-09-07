@@ -37,22 +37,22 @@ const [error, setError] = useState(null);
     fetchUsers();
   }, []);
   if(loading) 
-  return (<p class="text-center mt-5">Sedang mengambil data user...</p>)
+  return (<p className="text-center mt-5">Sedang mengambil data user...</p>)
   if(error)
     return (
-    <div class="alert alert-danger mt-5" role="alert">
+    <div className="alert alert-danger mt-5" role="alert">
     Error = {error}
     </div>
 )
 return(
 <div>
     <NavbarAdmin/>
-    <main class="container content-wrapper">
-        <h1 class="text-shadow">Data User</h1>
-        <p class="text-shadow">Di halaman ini, kamu dapat melihat siapa saja yang sudah terdaftar di aplikasi ini.</p>
-        <div class="card p-4 table-responsive">
-            <Link to="/tambah-user" class="btn btn-primary mb-3">Tambah</Link>
-            <table class="table table-bordered">
+    <main className="container content-wrapper">
+        <h1 className="text-shadow">Data User</h1>
+        <p className="text-shadow">Di halaman ini, kamu dapat melihat siapa saja yang sudah terdaftar di aplikasi ini.</p>
+        <div className="card p-4 table-responsive">
+            <Link to="/tambah-user" className="btn btn-primary mb-3">Tambah</Link>
+            <table className="table table-bordered">
                 <thead>
                     <tr>
                         <th scope="col">No</th>
@@ -70,8 +70,8 @@ return(
                     <td>{user.email}</td>
                     <td>{user.role}</td>
                     <td>
-                        <Link to={`/edit-user/${user.id}`} class="btn btn-warning text-dark">Edit</Link>
-                        <a href="#" class="btn btn-danger" onClick={() => handleDelete(user.id)}>Hapus</a>
+                        <Link to={`/edit-user/${user.id}`} className="btn btn-warning text-dark">Edit</Link>
+                        <a href="#" className="btn btn-danger" onClick={() => handleDelete(user.id)}>Hapus</a>
                     </td>
                 </tr>
                 ))}

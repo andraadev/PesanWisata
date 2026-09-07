@@ -37,11 +37,11 @@ const DataBooking = () => {
    return(
 <div>
 <Navbar />
-   <main class="container content-wrapper" style={{minHeight: '80vh'}}>
-      <h1 class="text-shadow">Data Booking</h1>
-      <p class="text-shadow">Di halaman ini, kamu dapat melihat destinasi mana saja yang pernah kamu booking.</p>
-      <div class="card p-4 table-responsive">
-         <table class="table">
+   <main className="container content-wrapper" style={{minHeight: '80vh'}}>
+      <h1 className="text-shadow">Data Booking</h1>
+      <p className="text-shadow">Di halaman ini, kamu dapat melihat destinasi mana saja yang pernah kamu booking.</p>
+      <div className="card p-4 table-responsive">
+         <table className="table">
             <thead>
                <tr>
                   <th scope="col">No</th>

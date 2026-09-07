@@ -1,6 +1,4 @@
-// import logo from './logo.svg';
-import './App.css';
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Home from './pages';
 import DestinasiWisata from './pages/destinasi_wisata';
 import Register from './pages/auth/register';
@@ -19,19 +17,19 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/destinasi" element={<DestinasiWisata/>} />
-        <Route path="/register" element={<Register/>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/beranda" element={<BerandaAdmin/>} />
-        <Route path="/data-user" element={<DataUser/>} />
-        <Route path="/tambah-user" element={<TambahDataUser/>} />
-        <Route path="/edit-user/:id" element={<EditDataUser/>} />
-        <Route path="/data-destinasi" element={<DataDestinasi/>} />
-        <Route path="/tambah-destinasi" element={<TambahDestinasi/>} />
-        <Route path="/edit-destinasi/:id" element={<EditDataDestinasi/>} />
-        <Route path="/booking/:slug" element={<Booking/>} />
-        <Route path="/data-booking" element={<DataBooking/>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/destinasi" element={<DestinasiWisata />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/beranda" element={<BerandaAdmin />} />
+        <Route path="/data-user" element={<DataUser />} />
+        <Route path="/tambah-user" element={<TambahDataUser />} />
+        <Route path="/edit-user/:id" element={<EditDataUser />} />
+        <Route path="/data-destinasi" element={<DataDestinasi />} />
+        <Route path="/tambah-destinasi" element={<TambahDestinasi />} />
+        <Route path="/edit-destinasi/:id" element={<EditDataDestinasi />} />
+        <Route path="/booking/:slug" element={<Booking />} />
+        <Route path="/data-booking" element={<DataBooking />} />
       </Routes>
     </Router>
   );
