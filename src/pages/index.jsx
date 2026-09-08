@@ -1,11 +1,15 @@
-import Navbar from '../components/navbar';
-import Footer from '../components/footer';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useOutletContext, Link } from 'react-router-dom';
 
 const Home = () => {
+  const { setPageTitle } = useOutletContext();
+
+  useEffect(() => {
+    setPageTitle('Beranda');
+  }, [setPageTitle]);
+
   return (
-    <body className="no-scrollbar">
-      <Navbar />
+    <>
       <section className="jumbotron container">
         <h1 className="jumbotron-header text-shadow">PesanWisata</h1>
         <p className="jumbotron-content text-shadow">
@@ -20,8 +24,7 @@ const Home = () => {
           Lihat Destinasi
         </Link>
       </section>
-      <Footer />
-    </body>
+    </>
   );
 };
 
