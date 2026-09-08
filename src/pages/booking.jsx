@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Footer from "../components/footer";
-import Navbar from "../components/navbar";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Footer from '../layouts/partials/footer';
+import Navbar from '../layouts/partials/navbar';
 
 const Booking = () => {
   const { slug } = useParams(); // Mengambil slug dari URL
@@ -11,7 +11,7 @@ const Booking = () => {
     booking_date: '',
     user_id: '',
     destination_id: '',
-    status: 'Selesai'
+    status: 'Selesai',
   });
   const [error, setError] = useState(null); // State untuk menyimpan pesan error
   const navigate = useNavigate();
@@ -58,11 +58,11 @@ const Booking = () => {
     e.preventDefault();
     setError(null);
 
-    console.log("Data yang diinputkan:", formData);
+    console.log('Data yang diinputkan:', formData);
 
     const formDataSubmit = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (key === "user_id" || key === "destination_id") {
+    Object.keys(formData).forEach((key) => {
+      if (key === 'user_id' || key === 'destination_id') {
         formDataSubmit.append(key, parseInt(formData[key]) || 0);
       } else {
         formDataSubmit.append(key, formData[key]);
@@ -71,7 +71,7 @@ const Booking = () => {
 
     try {
       const response = await fetch('http://localhost:8000/api/booking', {
-        method: "POST",
+        method: 'POST',
         body: formDataSubmit,
       });
 
@@ -99,7 +99,7 @@ const Booking = () => {
   return (
     <div>
       <Navbar />
-      <main className="container content-wrapper" style={{ minHeight: "80vh" }}>
+      <main className="container content-wrapper" style={{ minHeight: '80vh' }}>
         <h1 className="text-shadow">Booking</h1>
         {error && (
           <div className="alert alert-danger mt-3" role="alert">
@@ -109,15 +109,32 @@ const Booking = () => {
         <form onSubmit={handleSubmit} className="form-wrapper card p-4">
           <div className="row mb-3">
             <div className="col-sm-12 col-md-6">
-              <label htmlFor="booking_date" className="form-label">Tanggal Booking</label>
-              <input type="date" name="booking_date" id="booking_date" className="form-control" value={formData.booking_date} onChange={handleChange} />
+              <label htmlFor="booking_date" className="form-label">
+                Tanggal Booking
+              </label>
+              <input
+                type="date"
+                name="booking_date"
+                id="booking_date"
+                className="form-control"
+                value={formData.booking_date}
+                onChange={handleChange}
+              />
             </div>
             <div className="col-sm-12 col-md-6">
-              <label htmlFor="nama" className="form-label">Nama Kamu</label>
-              <select name="user_id" className="form-select" id="nama" value={formData.user_id} onChange={handleChange}>
+              <label htmlFor="nama" className="form-label">
+                Nama Kamu
+              </label>
+              <select
+                name="user_id"
+                className="form-select"
+                id="nama"
+                value={formData.user_id}
+                onChange={handleChange}
+              >
                 <option value="">Pilih User</option>
                 {users.length > 0 ? (
-                  users.map(user => (
+                  users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.name}
                     </option>
@@ -130,8 +147,15 @@ const Booking = () => {
           </div>
           <div className="row mb-3">
             <div className="col-sm-12 col-md-6">
-              <label htmlFor="destinasi_tujuan" className="form-label">Destinasi Tujuan</label>
-              <select name="destination_id" className="form-select" value={formData.destination_id} onChange={handleChange}>
+              <label htmlFor="destinasi_tujuan" className="form-label">
+                Destinasi Tujuan
+              </label>
+              <select
+                name="destination_id"
+                className="form-select"
+                value={formData.destination_id}
+                onChange={handleChange}
+              >
                 <option value="">Pilih Destinasi</option>
                 {destination ? (
                   <option value={destination.id} key={destination.id}>
@@ -143,17 +167,30 @@ const Booking = () => {
               </select>
             </div>
             <div className="col-sm-12 col-md-6">
-              <label htmlFor="status" className="form-label">Status</label><br />
-              <input type="radio" name="status" id="status" checked={formData.status === "Selesai"} className="form-check-input" value={formData.status} onChange={handleChange} />
+              <label htmlFor="status" className="form-label">
+                Status
+              </label>
+              <br />
+              <input
+                type="radio"
+                name="status"
+                id="status"
+                checked={formData.status === 'Selesai'}
+                className="form-check-input"
+                value={formData.status}
+                onChange={handleChange}
+              />
               <label htmlFor="status">Selesai</label>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary">Submit</button>
+          <button type="submit" className="btn btn-primary">
+            Submit
+          </button>
         </form>
       </main>
       <Footer />
     </div>
   );
-}
+};
 
 export default Booking;
