@@ -1,33 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import Footer from '../layouts/partials/footer';
-import Navbar from '../layouts/partials/navbar';
+import { useOutletContext, Link } from 'react-router-dom';
 
 const DataBooking = () => {
   const [bookingData, setBookingData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { setPageTitle, setPageSubtitle } = useOutletContext();
+
+  useEffect(() => {
+    setPageTitle('Reservasi Saya');
+    setPageSubtitle(
+      'Di halaman ini, kamu dapat melihat destinasi mana saja yang pernah kamu pesan tiketnya.'
+    );
+  }, [setPageTitle, setPageSubtitle]);
+
   useEffect(() => {
     const fetchBooking = async () => {
-      // const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://localhost:8000/api/booking', {
-          // headers: {
-          //     'Authorization': `Bearer ${token}`
-          // }
-        });
+        const response = await fetch('http://localhost:8000/api/booking');
         if (!response.ok) {
-          throw new error(`HTTP error ! Status:
-                       ${response.status}`);
+          throw new Error(`Gagal memuat data reservasi. Silakan coba lagi nanti.`);
         }
+
         const data = await response.json();
-        //cek log data
         if (Array.isArray(data.data)) {
-          setBookingData(data.data);
+          if (data.data.length === 0) {
+            setError('Data reservasi belum tersedia. Silakan coba lagi nanti.');
+          } else {
+            setBookingData(data.data);
+          }
         } else {
-          setError('Data bukan array!');
+          setError('Terjadi kesalahan saat memuat data reservasi');
         }
       } catch (error) {
-        setError(error.message);
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
       } finally {
         setLoading(false);
       }
@@ -36,36 +42,43 @@ const DataBooking = () => {
   }, []);
   return (
     <div>
-      <Navbar />
-      <main className="container content-wrapper" style={{ minHeight: '80vh' }}>
-        <h1 className="text-shadow">Data Booking</h1>
-        <p className="text-shadow">
-          Di halaman ini, kamu dapat melihat destinasi mana saja yang pernah kamu booking.
-        </p>
-        <div className="card p-4 table-responsive">
-          <table className="table">
-            <thead>
+      <div className="card p-4 table-responsive">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Nama</th>
+              <th scope="col">Destinasi</th>
+              <th scope="col">Tanggal Booking</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && (
               <tr>
-                <th scope="col">No</th>
-                <th scope="col">Nama</th>
-                <th scope="col">Destinasi</th>
-                <th scope="col">Tanggal Booking</th>
+                <td colSpan="4" className="text-center py-4">
+                  Sedang mengambil data reservasi dari server...
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {bookingData.map((booking, no) => (
-                <tr key={booking.id}>
-                  <th scope="row">{no + 1}</th>
-                  <td>{booking.name}</td>
-                  <td>{booking.destination}</td>
-                  <td>{booking.booking_date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
-      <Footer />
+            )}
+
+            {error && (
+              <tr>
+                <td colSpan="4" className="text-center py-4">
+                  {error}
+                </td>
+              </tr>
+            )}
+            {bookingData.map((booking, no) => (
+              <tr key={booking.id}>
+                <th scope="row">{no + 1}</th>
+                <td>{booking.name}</td>
+                <td>{booking.destination}</td>
+                <td>{booking.booking_date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
