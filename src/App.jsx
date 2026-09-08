@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import MainLayout from './layouts/main';
 import Home from './pages';
 import DestinasiWisata from './pages/destinasi_wisata';
 import Register from './pages/auth/register';
@@ -17,8 +18,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/destinasi" element={<DestinasiWisata />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/destinasi" element={<DestinasiWisata />} />
+          <Route path="/data-booking" element={<DataBooking />} />
+        </Route>
+        {/* <Route path="/" element={<Home />} />
+        <Route path="/destinasi" element={<DestinasiWisata />} /> */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/beranda" element={<BerandaAdmin />} />
@@ -29,7 +35,7 @@ function App() {
         <Route path="/tambah-destinasi" element={<TambahDestinasi />} />
         <Route path="/edit-destinasi/:id" element={<EditDataDestinasi />} />
         <Route path="/booking/:slug" element={<Booking />} />
-        <Route path="/data-booking" element={<DataBooking />} />
+        {/* <Route path="/data-booking" element={<DataBooking />} /> */}
       </Routes>
     </Router>
   );
