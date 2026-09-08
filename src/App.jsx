@@ -21,6 +21,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/destinasi" element={<DestinasiWisata />} />
+          <Route path="/booking/:slug" element={<Booking />} />
           <Route path="/data-booking" element={<DataBooking />} />
         </Route>
         {/* <Route path="/" element={<Home />} />
@@ -34,7 +35,7 @@ function App() {
         <Route path="/data-destinasi" element={<DataDestinasi />} />
         <Route path="/tambah-destinasi" element={<TambahDestinasi />} />
         <Route path="/edit-destinasi/:id" element={<EditDataDestinasi />} />
-        <Route path="/booking/:slug" element={<Booking />} />
+        {/* <Route path="/booking/:slug" element={<Booking />} /> */}
         {/* <Route path="/data-booking" element={<DataBooking />} /> */}
       </Routes>
     </Router>
