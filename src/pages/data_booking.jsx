@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link } from 'react-router-dom';
+import { fetchAPI, APIError } from '../services/api';
 
 const DataBooking = () => {
   const [bookingData, setBookingData] = useState([]);
@@ -17,23 +18,19 @@ const DataBooking = () => {
   useEffect(() => {
     const fetchBooking = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/booking');
-        if (!response.ok) {
-          throw new Error(`Gagal memuat data reservasi. Silakan coba lagi nanti.`);
-        }
+        const res = await fetchAPI('/booking');
 
-        const data = await response.json();
-        if (Array.isArray(data.data)) {
-          if (data.data.length === 0) {
-            setError('Data reservasi belum tersedia. Silakan coba lagi nanti.');
-          } else {
-            setBookingData(data.data);
-          }
+        if (Array.isArray(res?.data) && res.data.length > 0) {
+          setBookingData(res.data);
         } else {
-          setError('Terjadi kesalahan saat memuat data reservasi');
+          setError('Belum ada data reservasi. Mulai pesan sekarang!');
         }
       } catch (error) {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+        if (error instanceof APIError) {
+          setError(error.message);
+        } else {
+          setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+        }
       } finally {
         setLoading(false);
       }
@@ -53,12 +50,32 @@ const DataBooking = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && (
+            {/* {loading && (
               <tr>
                 <td colSpan="4" className="text-center py-4">
                   Sedang mengambil data reservasi dari server...
                 </td>
               </tr>
+            )} */}
+            {loading && (
+              <>
+                {[...Array(5)].map((_, i) => (
+                  <tr key={`skeleton-${i}`}>
+                    <th scope="row">
+                      <span className="placeholder col-12 placeholder-wave"></span>
+                    </th>
+                    <td>
+                      <span className="placeholder col-8 placeholder-wave"></span>
+                    </td>
+                    <td>
+                      <span className="placeholder col-10 placeholder-wave"></span>
+                    </td>
+                    <td>
+                      <span className="placeholder col-9 placeholder-wave"></span>
+                    </td>
+                  </tr>
+                ))}
+              </>
             )}
 
             {error && (
@@ -68,6 +85,7 @@ const DataBooking = () => {
                 </td>
               </tr>
             )}
+
             {bookingData.map((booking, no) => (
               <tr key={booking.id}>
                 <th scope="row">{no + 1}</th>
