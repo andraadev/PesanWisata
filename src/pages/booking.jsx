@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
-import Footer from '../layouts/partials/footer';
-import Navbar from '../layouts/partials/navbar';
+import { fetchAPI, APIError } from '../services/api';
 
 const Booking = () => {
-  const { slug } = useParams(); // Mengambil slug dari URL
-  const [users, setUsers] = useState([]); // State untuk menyimpan data user
-  const [destination, setDestination] = useState(null); // State untuk menyimpan data destinasi
+  const { slug } = useParams();
+  const navigate = useNavigate();
   const { setPageTitle } = useOutletContext();
+
+  const [users, setUsers] = useState([]);
+  const [destination, setDestination] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     booking_date: '',
     user_id: '',
-    destination_id: '',
     status: 'Selesai',
   });
+
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
@@ -26,92 +27,75 @@ const Booking = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersResponse = await fetch('http://localhost:8000/api/users');
-        if (!usersResponse.ok) {
-          throw new Error(`Gagal memuat data user. Silakan coba lagi nanti.`);
-        }
+        setLoading(true);
+        const [usersRes, destRes] = await Promise.all([
+          fetchAPI('/users'),
+          fetchAPI(`/destinations/${slug}`),
+        ]);
 
-        const usersData = await usersResponse.json();
-        if (Array.isArray(usersData.data)) {
-          if (usersData.data.length === 0) {
-            setError('Data user belum tersedia. Silakan coba lagi nanti.');
-          } else {
-            setUsers(usersData.data);
-            console.error('Invalid users response format:', usersData);
-          }
-        } else {
-          setError('Terjadi kesalahan saat memuat data user');
-        }
-
-        const destinationResponse = await fetch(`http://localhost:8000/api/destinations/${slug}`);
-
-        if (!destinationResponse.ok) {
-          throw new Error(`Gagal memuat data destinasi. Silakan coba lagi nanti.`);
-        }
-
-        const destinationData = await destinationResponse.json();
-        if (destinationData.data) {
-          setDestination(destinationData.data);
-        } else {
-          setError('Data destinasi belum tersedia. Silakan coba lagi nanti.');
-          console.error('Invalid destination response format:', destinationData);
+        if (usersRes?.data) setUsers(usersRes.data);
+        if (destRes?.data) {
+          setDestination(destRes.data);
         }
       } catch (err) {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+        setError(err.message || 'Gagal memuat data awal.');
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchData();
   }, [slug]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setValidationErrors({});
 
-    console.log('Data yang diinputkan:', formData);
-
-    const formDataSubmit = new FormData();
-    Object.keys(formData).forEach((key) => {
-      if (key === 'user_id' || key === 'destination_id') {
-        formDataSubmit.append(key, parseInt(formData[key]) || 0);
-      } else {
-        formDataSubmit.append(key, formData[key]);
-      }
-    });
+    const payload = {
+      ...formData,
+      user_id: Number(formData.user_id) || 0,
+      destination_id: destination?.id || 0,
+    };
 
     try {
-      const response = await fetch('http://localhost:8000/api/booking', {
+      await fetchAPI('/booking', {
         method: 'POST',
-        body: formDataSubmit,
+        body: JSON.stringify(payload),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (response.status === 422) {
-          // Handle validation errors
-          // setError(`Error 422: ${errorData.message || 'Tanggal Booking Wajib Diisi!'}`);
-          setValidationErrors(errorData);
-        } else if (response.status === 500) {
-          // Handle server errors
-          setError('Error 500: Terjadi Masalah di Sisi Server');
-        } else {
-          setError(`HTTP Error | Status ${response.status}: ${response.statusText}`);
-        }
-        return;
-      }
 
       alert('Booking berhasil ditambahkan');
       navigate('/data-booking');
     } catch (error) {
-      setError(`Network Error: ${error.message}`);
+      if (err instanceof APIError && err.status === 422) {
+        setValidationErrors(error.errors || {});
+      } else {
+        setError(err.message || 'Terjadi kesalahan saat menyimpan booking.');
+      }
     }
   };
 
+  if (loading) {
+    return (
+      <div className="card p-4 placeholder-glow">
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <div className="placeholder col-4 mb-2"></div>
+            <div className="placeholder col-12 py-3 rounded"></div>
+          </div>
+          <div className="col-md-6">
+            <div className="placeholder col-4 mb-2"></div>
+            <div className="placeholder col-12 py-3 rounded"></div>
+          </div>
+        </div>
+        <div className="placeholder col-3 py-3 rounded btn-primary"></div>
+      </div>
+    );
+  }
   return (
     <div>
       {error && (
@@ -119,6 +103,7 @@ const Booking = () => {
           {error}
         </div>
       )}
+
       <form onSubmit={handleSubmit} className="form-wrapper card p-4">
         <div className="row mb-3">
           <div className="col-sm-12 col-md-6">
@@ -137,65 +122,58 @@ const Booking = () => {
               <div className="invalid-feedback">{validationErrors.booking_date[0]}</div>
             )}
           </div>
+
           <div className="col-sm-12 col-md-6">
-            <label htmlFor="nama" className="form-label">
+            <label htmlFor="user_id" className="form-label">
               Nama Kamu
             </label>
             <select
               name="user_id"
-              // className="form-select"
+              id="user_id"
               className={`form-select ${validationErrors.user_id ? 'is-invalid' : ''}`}
-              id="nama"
               value={formData.user_id}
               onChange={handleChange}
             >
               <option value="">Pilih User</option>
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))
-              ) : (
-                <option value="">Loading...</option>
-              )}
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
             </select>
             {validationErrors.user_id && (
               <div className="invalid-feedback">{validationErrors.user_id[0]}</div>
             )}
           </div>
         </div>
+
         <div className="row mb-3">
           <div className="col-sm-12 col-md-6">
             <label htmlFor="destinasi_tujuan" className="form-label">
               Destinasi Tujuan
             </label>
-            {destination ? (
-              <>
-                <input type="text" value={destination.name} className="form-control" disabled />
-                <input type="hidden" name="destination_id" value={destination.id} />
-              </>
-            ) : (
-              <p>Loading...</p>
-            )}
+            <input type="text" value={destination?.name || ''} className="form-control" disabled />
           </div>
-          <div className="col-sm-12 col-md-6 ">
+
+          <div className="col-sm-12 col-md-6">
             <label htmlFor="status" className="form-label">
               Status
             </label>
-            <br />
-            <input
-              type="radio"
-              name="status"
-              id="status"
-              checked={formData.status === 'Selesai'}
-              className="form-check-input me-2"
-              value={formData.status}
-              onChange={handleChange}
-            />
-            <label htmlFor="status">Selesai</label>
+            <div>
+              <input
+                type="radio"
+                name="status"
+                id="status"
+                checked={formData.status === 'Selesai'}
+                className="form-check-input me-2"
+                value="Selesai"
+                onChange={handleChange}
+              />
+              <label htmlFor="status">Selesai</label>
+            </div>
           </div>
         </div>
+
         <button type="submit" className="btn btn-primary">
           Reservasi
         </button>
