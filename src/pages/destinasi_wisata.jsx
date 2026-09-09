@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link } from 'react-router-dom';
+import { fetchAPI, APIError } from '../services/api';
 
 const DestinasiWisata = () => {
   const [destinasiData, setDestinasiData] = useState([]);
@@ -16,27 +17,24 @@ const DestinasiWisata = () => {
   useEffect(() => {
     const fetchDestinasi = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/destinations');
+        const res = await fetchAPI('/destinations');
 
-        if (!response.ok) {
-          throw new Error(`Gagal memuat data destinasi. Silakan coba lagi nanti.`);
-        }
-        const data = await response.json();
-        if (Array.isArray(data.data)) {
-          if (data.data.length === 0) {
-            setError('Data destinasi belum tersedia. Silakan coba lagi nanti.');
-          } else {
-            setDestinasiData(data.data);
-          }
+        if (Array.isArray(res?.data) && res.data.length > 0) {
+          setDestinasiData(res.data);
         } else {
-          setError('Terjadi kesalahan saat memuat data destinasi');
+          setError('Data destinasi belum tersedia. Silakan coba lagi nanti.');
         }
-      } catch (error) {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      } catch (err) {
+        if (err instanceof APIError) {
+          setError(err.message);
+        } else {
+          setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+        }
       } finally {
         setLoading(false);
       }
     };
+
     fetchDestinasi();
   }, []);
 
@@ -53,11 +51,7 @@ const DestinasiWisata = () => {
       <section className="destination-cards-wrapper container-fluid row grid gap-5">
         {destinasiData.map((destinasi) => (
           <div className="card col-4 col-sm-12 p-0" style={{ width: '18rem' }}>
-            <img
-              src="assets/images/pura-tanah-lot-tempel-am-meer-istock-494560541.jpg"
-              className="card-img-top"
-              alt="pura tanah lot"
-            />
+            <img src={destinasi.image_url} className="card-img-top" alt="pura tanah lot" />
             <div className="card-body">
               <h5 className="card-title">
                 {destinasi.name}
