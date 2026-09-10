@@ -1,64 +1,107 @@
-import React, {useState} from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+import { fetchAPI, APIError } from '../../services/api';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
+  const { setPageTitle, setPageSubtitle } = useOutletContext();
 
-        // panggil api
-        try {
-            const response = await fetch('http://localhost:8000/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({email, password})
-            });
-            const data = await response.json();
-            if (response.ok && data.status === 'success') {
-                localStorage.setItem('token', data.token);
-                alert('Login sebagai admin berhasil!')
-                // redirect ke halaman beranda Admin
-                navigate('/data-user');
-            } else {
-                setError(data.message || 'Login Gagal');
-            }
-        } catch (error) {
-            setError('Terjadi Masalah pada Sistem.');
+  useEffect(() => {
+    setPageTitle('Login');
+    setPageSubtitle('Silakan masukkan email kamu dan password untuk melanjutkan.');
+  }, [setPageTitle, setPageSubtitle]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setValidationErrors({});
+    setLoading(true);
+
+    try {
+      const response = await fetchAPI('/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response?.success) {
+        localStorage.setItem('token', response.data.token);
+        alert('Login sebagai admin berhasil!');
+        navigate('/data-user');
+      }
+    } catch (err) {
+      if (err instanceof APIError) {
+        if (err.status === 422) {
+          setValidationErrors(err.errors || {});
+        } else {
+          setError(err.message || 'Login Gagal');
         }
+      } else {
+        setError('Terjadi Masalah pada Sistem.');
+      }
+    } finally {
+      setLoading(false);
     }
-return(
-<div className="container mt-5">
-<Link to="/" className="btn btn-secondary">Kembali ke Halaman Utama</Link>
-    <h1 className="text-shadow">Login</h1>
-    <p className="text-shadow">Silakan masukkan email kamu dan password untuk melanjutkan.</p>
-    {/* Menampilkan error global (jika ada) */}
-    {error && (
+  };
+
+  return (
+    <div>
+      {error && (
         <div className="alert alert-danger mt-3" role="alert">
-            {error}
+          {error}
         </div>
-    )}
-    <form onSubmit={handleLogin} className="card p-3">
-        <div id="input-group" className="mb-3">
-            <label for="email" className="form-label">Email</label>
-            <input type="email" name="email" id="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+      )}
+      <form onSubmit={handleLogin} className="card p-3">
+        <div className="mb-3">
+          <label htmlFor="email" className="form-label">
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          {validationErrors.email && (
+            <div className="invalid-feedback">{validationErrors.email[0]}</div>
+          )}
         </div>
-        <div id="input-group" className="mb-3">
-            <label for="password" className="form-label">Kata Sandi</label>
-            <input type="password" name="password" id="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required/>
+
+        <div className="mb-3">
+          <label htmlFor="password" className="form-label">
+            Kata Sandi
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {validationErrors.password && (
+            <div className="invalid-feedback">{validationErrors.password[0]}</div>
+          )}
         </div>
-        <button type="submit" className="btn btn-primary">Masuk</button>
+
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Memproses...' : 'Masuk'}
+        </button>
         <p className="register-account text-center mt-3">
-            Tidak memiliki akun? <Link to="/register">Buat akun baru</Link> untuk memulai.
+          Tidak memiliki akun? <Link to="/register">Buat akun baru</Link> untuk memulai.
         </p>
-    </form>
-</div>
-);
-}
+      </form>
+    </div>
+  );
+};
+
 export default Login;
