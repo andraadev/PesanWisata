@@ -1,4 +1,3 @@
-// Custom Error khusus untuk menampung status code & validation errors
 export class APIError extends Error {
     constructor(message, status, errors = null) {
         super(message);
@@ -37,7 +36,10 @@ export const fetchAPI = async (endpoint, options = {}) => {
 
     if (!response.ok) {
         const errorMessage = data?.message || `Terjadi kesalahan server (${response.status})`;
-        const validationErrors = data?.errors || null;
+
+        const validationErrors = response.status === 422
+            ? (data?.errors || data || null)
+            : (data?.errors || null);
 
         throw new APIError(errorMessage, response.status, validationErrors);
     }
