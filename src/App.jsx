@@ -13,6 +13,7 @@ import TambahDestinasi from './pages/admin/destinations/add';
 import EditDataDestinasi from './pages/admin/destinations/update';
 import DataBooking from './pages/data_booking';
 import Booking from './pages/booking';
+import AuthLayout from './layouts/auth';
 
 function App() {
   return (
@@ -26,8 +27,10 @@ function App() {
         </Route>
         {/* <Route path="/" element={<Home />} />
         <Route path="/destinasi" element={<DestinasiWisata />} /> */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route element={<AuthLayout />}>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
         <Route path="/beranda" element={<BerandaAdmin />} />
         <Route path="/data-user" element={<DataUser />} />
         <Route path="/tambah-user" element={<TambahDataUser />} />
