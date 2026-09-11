@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import NavbarAdmin from '../../../layouts/partials/navbar_admin';
+import Navbar from '../../../layouts/partials/navbar';
 import Footer from '../../../layouts/partials/footer';
 
 const EditUser = () => {
@@ -71,7 +71,7 @@ const EditUser = () => {
     );
   return (
     <div>
-      <NavbarAdmin />
+      <Navbar />
       <main className="container content-wrapper">
         <h1>Edit User</h1>
         <form onSubmit={handleSubmit}>

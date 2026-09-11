@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import NavbarAdmin from '../../../layouts/partials/navbar_admin';
+import Navbar from '../../../layouts/partials/navbar';
 import Footer from '../../../layouts/partials/footer';
 
 const DataUser = () => {
@@ -45,7 +45,7 @@ const DataUser = () => {
     );
   return (
     <div>
-      <NavbarAdmin />
+      <Navbar />
       <main className="container content-wrapper">
         <h1 className="text-shadow">Data User</h1>
         <p className="text-shadow">

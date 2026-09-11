@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import NavbarAdmin from '../../../layouts/partials/navbar_admin';
+import Navbar from '../../../layouts/partials/navbar';
 import Footer from '../../../layouts/partials/footer';
 import { useNavigate } from 'react-router-dom';
 
@@ -58,7 +58,7 @@ const TambahDataUser = () => {
 
   return (
     <div>
-      <NavbarAdmin />
+      <Navbar />
       <main className="container content-wrapper">
         <a href="/data-user" className="btn btn-secondary">
           Kembali ke Halaman Data User

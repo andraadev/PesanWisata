@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import NavbarAdmin from '../../../layouts/partials/navbar_admin';
+import Navbar from '../../../layouts/partials/navbar';
 import Footer from '../../../layouts/partials/footer';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -92,7 +92,7 @@ const EditDataDestinasi = () => {
 
   return (
     <div>
-      <NavbarAdmin />
+      <Navbar />
       <main className="container content-wrapper">
         <a href="/data-destinasi" className="btn btn-secondary">
           Kembali ke Halaman Data Destinasi

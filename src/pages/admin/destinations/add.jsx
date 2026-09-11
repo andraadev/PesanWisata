@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import NavbarAdmin from '../../../layouts/partials/navbar_admin';
+import Navbar from '../../../layouts/partials/navbar';
 import Footer from '../../../layouts/partials/footer';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -65,7 +65,7 @@ const TambahDestinasi = () => {
   };
   return (
     <div>
-      <NavbarAdmin />
+      <Navbar />
       <main className="container content-wrapper">
         <Link to="/data-destinasi" className="btn btn-secondary">
           Kembali ke Halaman Data Destinasi
