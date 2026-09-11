@@ -14,6 +14,8 @@ import EditDataDestinasi from './pages/admin/destinations/update';
 import DataBooking from './pages/data_booking';
 import Booking from './pages/booking';
 import AuthLayout from './layouts/auth';
+import AdminLayout from './layouts/admin';
+import ProtectedRoute from './layouts/components/ProtectedRoute';
 
 function App() {
   return (
@@ -22,24 +24,29 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/destinasi" element={<DestinasiWisata />} />
-          <Route path="/booking/:slug" element={<Booking />} />
-          <Route path="/data-booking" element={<DataBooking />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/booking/:slug" element={<Booking />} />
+            <Route path="/data-booking" element={<DataBooking />} />
+          </Route>
         </Route>
-        {/* <Route path="/" element={<Home />} />
-        <Route path="/destinasi" element={<DestinasiWisata />} /> */}
         <Route element={<AuthLayout />}>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Route>
-        <Route path="/beranda" element={<BerandaAdmin />} />
-        <Route path="/data-user" element={<DataUser />} />
-        <Route path="/tambah-user" element={<TambahDataUser />} />
-        <Route path="/edit-user/:id" element={<EditDataUser />} />
-        <Route path="/data-destinasi" element={<DataDestinasi />} />
-        <Route path="/tambah-destinasi" element={<TambahDestinasi />} />
-        <Route path="/edit-destinasi/:id" element={<EditDataDestinasi />} />
-        {/* <Route path="/booking/:slug" element={<Booking />} /> */}
-        {/* <Route path="/data-booking" element={<DataBooking />} /> */}
+
+        <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/beranda" element={<BerandaAdmin />} />
+          </Route>
+          <Route path="/data-user" element={<DataUser />} />
+          <Route path="/tambah-user" element={<TambahDataUser />} />
+          <Route path="/edit-user/:id" element={<EditDataUser />} />
+          <Route path="/data-destinasi" element={<DataDestinasi />} />
+          <Route path="/tambah-destinasi" element={<TambahDestinasi />} />
+          <Route path="/edit-destinasi/:id" element={<EditDataDestinasi />} />
+          <Route path="/data-booking" element={<DataBooking />} />
+        </Route>
       </Routes>
     </Router>
   );
