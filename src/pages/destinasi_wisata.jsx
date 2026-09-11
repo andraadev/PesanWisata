@@ -39,7 +39,40 @@ const DestinasiWisata = () => {
   }, []);
 
   if (loading) {
-    return <p className="text-white">Sedang mengambil data destinasi dari server...</p>;
+    return (
+      <div>
+        <section className="destination-cards-wrapper container-fluid row grid gap-5">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="card col-12 col-md-6 col-lg-4 p-0" style={{ width: '18rem' }}>
+              <div className="card-img-top placeholder-glow" style={{ height: '12rem' }}>
+                <span
+                  className="placeholder col-12 placeholder-wave"
+                  style={{ height: '100%', display: 'block' }}
+                ></span>
+              </div>
+              <div className="card-body">
+                <h5 className="card-title">
+                  <span className="placeholder col-6 placeholder-wave"></span>
+                  <span className="badge text-bg-primary ms-2" style={{ visibility: 'hidden' }}>
+                    &nbsp;
+                  </span>
+                </h5>
+                <p className="card-text description">
+                  <span className="placeholder col-12 placeholder-wave d-block"></span>
+                  <span className="placeholder col-10 placeholder-wave d-block mt-2"></span>
+                  <span className="placeholder col-8 placeholder-wave d-block mt-2"></span>
+                </p>
+                <div className="d-grid">
+                  <span className="btn btn-primary disabled placeholder col-12 placeholder-wave">
+                    &nbsp;
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+    );
   }
 
   if (error) {
@@ -50,8 +83,13 @@ const DestinasiWisata = () => {
     <div>
       <section className="destination-cards-wrapper container-fluid row grid gap-5">
         {destinasiData.map((destinasi) => (
-          <div className="card col-4 col-sm-12 p-0" style={{ width: '18rem' }}>
-            <img src={destinasi.image_url} className="card-img-top" alt="pura tanah lot" />
+          <div key={destinasi.id} className="card col-4 col-sm-12 p-0" style={{ width: '18rem' }}>
+            <img
+              src={destinasi.image_url}
+              className="card-img-top"
+              alt={destinasi.name}
+              loading="lazy"
+            />
             <div className="card-body">
               <h5 className="card-title">
                 {destinasi.name}
