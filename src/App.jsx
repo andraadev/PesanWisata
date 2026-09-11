@@ -37,15 +37,15 @@ function App() {
 
         <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
           <Route element={<AdminLayout />}>
-            <Route path="/beranda" element={<BerandaAdmin />} />
+            <Route path="/admin/beranda" element={<BerandaAdmin />} />
+            <Route path="/admin/data-user" element={<DataUser />} />
+            <Route path="/admin/tambah-user" element={<TambahDataUser />} />
+            <Route path="/admin/edit-user/:id" element={<EditDataUser />} />
+            <Route path="/admin/data-destinasi" element={<DataDestinasi />} />
+            <Route path="/admin/tambah-destinasi" element={<TambahDestinasi />} />
+            <Route path="/admin/edit-destinasi/:id" element={<EditDataDestinasi />} />
+            <Route path="/admin/data-booking" element={<DataBooking />} />
           </Route>
-          <Route path="/data-user" element={<DataUser />} />
-          <Route path="/tambah-user" element={<TambahDataUser />} />
-          <Route path="/edit-user/:id" element={<EditDataUser />} />
-          <Route path="/data-destinasi" element={<DataDestinasi />} />
-          <Route path="/tambah-destinasi" element={<TambahDestinasi />} />
-          <Route path="/edit-destinasi/:id" element={<EditDataDestinasi />} />
-          <Route path="/data-booking" element={<DataBooking />} />
         </Route>
       </Routes>
     </Router>
