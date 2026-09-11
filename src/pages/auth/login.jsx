@@ -30,10 +30,16 @@ const Login = () => {
       });
 
       if (response?.success) {
+        const user = response.data.user;
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        alert('Login sebagai admin berhasil!');
-        navigate('/data-user');
+        if (user?.role === 'Admin') {
+          alert(`Selamat datang kembali, Admin ${user.name}!`);
+          navigate('/data-user');
+        } else {
+          alert(`Login berhasil! Selamat datang, ${user.name}.`);
+          navigate('/');
+        }
       }
     } catch (err) {
       if (err instanceof APIError) {
