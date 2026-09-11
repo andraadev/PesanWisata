@@ -1,11 +1,37 @@
-import { NavLink, Link } from 'react-router-dom';
-
+import React from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem('token');
+
+  const getUserData = () => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      if (!savedUser || savedUser === 'undefined') return null;
+      return JSON.parse(savedUser);
+    } catch (error) {
+      console.error('Gagal parse data user dari localStorage:', error);
+      return null;
+    }
+  };
+
+  const user = getUserData();
+  const role = user?.role; // 'Admin', 'User', or undefined (Tamu)
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    alert('Berhasil keluar.');
+    navigate('/login');
+  };
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
         <Link to="/" className="navbar-brand fw-bolder">
           PesanWisata
+          {role === 'Admin' && <span className="badge text-bg-primary ms-2">Admin</span>}{' '}
         </Link>
         <button
           className="navbar-toggler"
@@ -30,19 +56,51 @@ const Navbar = () => {
                 Destinasi Wisata
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink to="/data-booking" className="nav-link">
-                Reservasi Saya
-              </NavLink>
-            </li>
+            {token && role === 'Admin' && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link active text-white" aria-current="page" to="/beranda">
+                    Beranda
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link text-white" to="/data-user">
+                    Data User
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link text-white" to="/data-destinasi">
+                    Data Destinasi
+                  </NavLink>
+                </li>
+              </>
+            )}
+            {token && role === 'User' && (
+              <li className="nav-item">
+                <NavLink to="/data-booking" className="nav-link">
+                  Reservasi Saya
+                </NavLink>
+              </li>
+            )}
           </ul>
-          <div className="button-wrapper d-flex gap-2">
-            <Link to="/login" className="btn btn-primary">
-              Masuk
-            </Link>
-            <Link to="/register" className="btn btn-light">
-              Daftar
-            </Link>
+          <div className="button-wrapper d-flex align-items-center gap-2">
+            {token ? (
+              <>
+                <span className="me-2">Halo, {user?.name}</span>
+                <button onClick={handleLogout} className="btn btn-danger">
+                  Keluar
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="btn btn-outline-dark me-2">
+                  Masuk
+                </Link>
+                <Link to="/register" className="btn btn-primary">
+                  Daftar
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
