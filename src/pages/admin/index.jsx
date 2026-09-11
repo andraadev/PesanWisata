@@ -1,15 +1,19 @@
-import React from 'react';
-import NavbarAdmin from '../../layouts/partials/navbar_admin';
-import Footer from '../../layouts/partials/footer';
+import { useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
+
 const BerandaAdmin = () => {
+  const { setPageTitle } = useOutletContext();
+
+  useEffect(() => {
+    setPageTitle('Beranda');
+  }, [setPageTitle]);
+
   return (
     <div className="no-scrollbar">
-      <NavbarAdmin />
       <section className="jumbotron container">
         <h1 className="jumbotron-header text-shadow">Beranda</h1>
         <p className="jumbotron-content text-shadow">Selamat datang, Admin!</p>
       </section>
-      <Footer />
     </div>
   );
 };
