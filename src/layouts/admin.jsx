@@ -18,7 +18,7 @@ const AdminLayout = () => {
       <div className="container flex-grow-1 py-3">
         <div className="row g-3">
           <main className="col-12">
-            {location.pathname !== '/' && (
+            {location.pathname !== '/admin/beranda' && (
               <div className="mb-4">
                 <h2 className="fw-bold text-white text-shadow">{pageTitle}</h2>
 
