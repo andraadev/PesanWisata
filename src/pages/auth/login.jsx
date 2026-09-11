@@ -31,6 +31,7 @@ const Login = () => {
 
       if (response?.success) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
         alert('Login sebagai admin berhasil!');
         navigate('/data-user');
       }
