@@ -21,9 +21,15 @@ export const fetchAPI = async (endpoint, options = {}) => {
         headers['Content-Type'] = 'application/json';
     }
 
+    let formattedBody = options.body;
+    if (options.body && !isFormData && typeof options.body === 'object') {
+        formattedBody = JSON.stringify(options.body);
+    }
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
         ...options,
         headers,
+        body: formattedBody,
     });
 
     if (response.status === 204) {
