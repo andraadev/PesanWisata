@@ -4,7 +4,7 @@ import { fetchAPI, APIError } from '../../../services/api';
 
 const DataUser = () => {
   const [usersData, setUsersData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState(null);
 
   const { setPageTitle, setPageSubtitle } = useOutletContext();
@@ -19,7 +19,7 @@ const DataUser = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        setLoading(true);
+        setIsFetching(true);
         const result = await fetchAPI('/admin/users');
         if (Array.isArray(result?.data)) {
           setUsersData(result.data);
@@ -41,7 +41,7 @@ const DataUser = () => {
           setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
         }
       } finally {
-        setLoading(false);
+        setIsFetching(false);
       }
     };
 
@@ -92,7 +92,7 @@ const DataUser = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && (
+            {isFetching && (
               <>
                 {[...Array(5)].map((_, i) => (
                   <tr key={`skeleton-${i}`}>
