@@ -1,34 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Navbar from '../../../layouts/partials/navbar';
-import Footer from '../../../layouts/partials/footer';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { fetchAPI, APIError } from '../../../services/api';
 
 const EditUser = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState({ name: '', email: '', role: '' });
-  const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const { setPageTitle } = useOutletContext();
+
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: '',
+  });
+
+  useEffect(() => {
+    setPageTitle('Edit Data User');
+  }, [setPageTitle]);
 
   useEffect(() => {
     const fetchUser = async () => {
-      //   const token = localStorage.getItem('token');
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
-          //   headers: {
-          //     // 'Authorization': `Bearer ${token}`
-          //   }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+        setIsFetching(true);
+        const response = await fetchAPI(`/admin/users/${id}`);
+
+        if (response?.data) {
+          setUser({
+            name: response.data.name || '',
+            email: response.data.email || '',
+            role: response.data.role || '',
+            password: '',
+          });
         }
-        const result = await response.json();
-        console.log('Fetched user data:', result); // Log data untuk debugging
-        setUser(result.data); // Akses data dari result.data
       } catch (error) {
-        setError('Terjadi kesalahan saat mengambil data: ' + error.message);
+        console.error('[Fetch User Error]:', error);
+        setError('Gagal mengambil data user. Silakan coba lagi nanti');
       } finally {
-        setLoading(false);
+        setIsFetching(false);
       }
     };
 
@@ -42,97 +54,168 @@ const EditUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const token = localStorage.getItem('token');
+    setError(null);
+    setErrors({});
+
+    const payload = {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    if (user.password) {
+      payload.password = user.password;
+    }
+
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
+      setIsSubmitting(true);
+      const data = await fetchAPI(`/admin/users/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          //   'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(user),
+        body: payload,
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+
+      if (data) {
+        alert(data.message);
+        navigate('/admin/data-user');
       }
-      navigate('/data-user');
     } catch (error) {
-      setError('Terjadi kesalahan saat memperbarui data: ' + error.message);
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setErrors(error.errors || {});
+        } else if (error.status === 401) {
+          setError('Sesi Anda telah berakhir. Silakan login kembali.');
+        } else {
+          setError('Gagal mengubah data user. Silakan coba lagi nanti.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
     }
   };
 
-  if (loading)
-    return <p className="text-center mt-5">Sedang mengambil data user berdasarkan ID...</p>;
-  if (error)
-    return (
-      <div className="alert alert-danger mt-5" role="alert">
-        Error = {error}
-      </div>
-    );
   return (
     <div>
-      <Navbar />
-      <main className="container content-wrapper">
-        <h1>Edit User</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="row">
-            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-              <label htmlFor="nama_lengkap" className="form-label">
-                Nama
-              </label>
-              <input
-                type="text"
-                name="name"
-                id="nama_lengkap"
-                className="form-control"
-                value={user.name}
-                onChange={handleChange}
-                autoFocus
-              />
-            </div>
-            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className="form-control"
-                value={user.email}
-                onChange={handleChange}
-              />
-            </div>
+      <a href="/admin/data-user" className="btn btn-secondary mb-3">
+        Kembali ke Halaman Data User
+      </a>
+      <div className="card p-4">
+        {error && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {error}
           </div>
-          <div className="row">
-            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-              <label htmlFor="password" className="form-label">
-                Kata Sandi
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                className="form-control"
-                value={user.password}
-                onChange={handleChange}
-              />
+        )}
+
+        {isFetching ? (
+          <div className="placeholder-glow">
+            <div className="row">
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label className="form-label">Nama</label>
+                <div
+                  className="form-control placeholder col-12 placeholder-wave"
+                  style={{ height: '38px' }}
+                ></div>
+              </div>
+
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label className="form-label">Email</label>
+                <div
+                  className="form-control placeholder col-12 placeholder-wave"
+                  style={{ height: '38px' }}
+                ></div>
+              </div>
             </div>
-            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-              <label className="form-label">Role</label>
-              <select name="role" className="form-select" value={user.role} onChange={handleChange}>
-                <option value="">Pilih Role</option>
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-              </select>
+
+            <div className="row">
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label className="form-label">Password (Opsional)</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Kosongkan jika tidak ingin mengubah"
+                  disabled
+                />
+              </div>
+
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label className="form-label">Role</label>
+                <div
+                  className="form-select placeholder col-12 placeholder-wave"
+                  style={{ height: '38px' }}
+                ></div>
+              </div>
             </div>
+
+            <button className="btn btn-primary disabled placeholder col-2">Simpan</button>
           </div>
-          <button type="submit" className="btn btn-primary">
-            Simpan
-          </button>
-        </form>
-      </main>
-      <Footer />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="row">
+              <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="nama_lengkap" className="form-label">
+                  Nama
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="nama_lengkap"
+                  className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                  value={user.name}
+                  onChange={handleChange}
+                  autoFocus
+                />
+                {errors.name && <div className="invalid-feedback">{errors.name[0]}</div>}
+              </div>
+              <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="email" className="form-label">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                  value={user.email}
+                  onChange={handleChange}
+                />
+                {errors.email && <div className="invalid-feedback">{errors.email[0]}</div>}
+              </div>
+            </div>
+            <div className="row">
+              <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="password" className="form-label">
+                  Password (Opsional)
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="Kosongkan jika tidak ingin mengubah"
+                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                  onChange={handleChange}
+                />
+                {errors.password && <div className="invalid-feedback">{errors.password[0]}</div>}
+              </div>
+              <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+                <label className="form-label">Role</label>
+                <select
+                  name="role"
+                  className={`form-select ${errors.role ? 'is-invalid' : ''}`}
+                  value={user.role}
+                  onChange={handleChange}
+                >
+                  <option value="">Pilih Role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="User">User</option>
+                </select>
+                {errors.role && <div className="invalid-feedback">{errors.role[0]}</div>}
+              </div>
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Memproses...' : 'Simpan'}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };
