@@ -13,7 +13,7 @@ const TambahDataUser = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { setPageTitle } = useOutletContext();
 
@@ -39,7 +39,7 @@ const TambahDataUser = () => {
     };
 
     try {
-      setLoading(true);
+      setIsSubmitting(true);
       const token = localStorage.getItem('token');
       const data = await fetchAPI('/admin/users', {
         method: 'POST',
@@ -63,7 +63,7 @@ const TambahDataUser = () => {
         setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
       }
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -140,8 +140,8 @@ const TambahDataUser = () => {
               {errors.role && <div className="invalid-feedback">{errors.role[0]}</div>}
             </div>
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Memproses...' : 'Tambah'}
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? 'Memproses...' : 'Tambah'}
           </button>
         </form>
       </div>
