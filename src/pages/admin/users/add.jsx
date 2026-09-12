@@ -40,15 +40,15 @@ const TambahDataUser = () => {
 
     try {
       setIsSubmitting(true);
-      const token = localStorage.getItem('token');
       const data = await fetchAPI('/admin/users', {
         method: 'POST',
         body: payload,
       });
 
       if (data.success) {
-        alert(data.message);
-        navigate('/admin/data-user');
+        navigate('/admin/data-user', {
+          state: { message: data.message },
+        });
       }
     } catch (error) {
       if (error instanceof APIError) {

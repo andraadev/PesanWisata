@@ -75,8 +75,9 @@ const EditUser = () => {
       });
 
       if (data) {
-        alert(data.message);
-        navigate('/admin/data-user');
+        navigate('/admin/data-user', {
+          state: { message: data.message },
+        });
       }
     } catch (error) {
       if (error instanceof APIError) {
