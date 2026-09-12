@@ -18,28 +18,27 @@ const DataUser = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem('token');
       try {
         setLoading(true);
-        const result = await fetchAPI('/admin/users', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (Array.isArray(result?.data) && result.data.length > 0) {
+        const result = await fetchAPI('/admin/users');
+        if (Array.isArray(result?.data)) {
           setUsersData(result.data);
         } else {
-          setError('Data user tidak valid atau belum tersedia. Silakan coba lagi nanti.');
+          console.error(
+            '[Fetch Users Error]: Expecting array in response.data, got:',
+            result?.data
+          );
+          setError('Gagal menampilkan data user. Silakan segarkan (refresh) halaman.');
         }
       } catch (error) {
         if (error instanceof APIError) {
           if (error.status === 401) {
             setError('Sesi telah berakhir, silakan login kembali.');
           } else {
-            setError(error.message);
+            setError('Gagal memuat data user. Silakan coba lagi nanti.');
           }
         } else {
-          setError('Terjadi kesalahan koneksi/server');
+          setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
         }
       } finally {
         setLoading(false);
@@ -55,15 +54,12 @@ const DataUser = () => {
         'Apakah anda yakin? Tindakan ini mungkin memengaruhi data user ini di tabel lain.'
       )
     ) {
-      const token = localStorage.getItem('token');
       try {
-        await fetchAPI(`/admin/users/${id}`, {
+        const data = await fetchAPI(`/admin/users/${id}`, {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         });
 
+        alert(data.message);
         setUsersData((prevUsers) => prevUsers.filter((user) => user.id !== id));
       } catch (error) {
         if (err instanceof APIError) {
@@ -82,7 +78,7 @@ const DataUser = () => {
   return (
     <div>
       <div className="card p-4 table-responsive">
-        <Link to="/tambah-user" className="btn btn-primary mb-3">
+        <Link to="/admin/tambah-user" className="btn btn-primary mb-3">
           Tambah
         </Link>
         <table className="table table-bordered">
@@ -133,7 +129,7 @@ const DataUser = () => {
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td className="d-flex gap-2">
-                  <Link to={`/edit-user/${user.id}`} className="btn btn-warning text-dark">
+                  <Link to={`/admin/edit-user/${user.id}`} className="btn btn-warning text-dark">
                     Edit
                   </Link>
                   <a href="#" className="btn btn-danger" onClick={() => handleDelete(user.id)}>
