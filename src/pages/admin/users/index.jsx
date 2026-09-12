@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useOutletContext, Link } from 'react-router-dom';
+import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const DataUser = () => {
   const [usersData, setUsersData] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const [toastMessage, setToastMessage] = useState(null);
 
   const { setPageTitle, setPageSubtitle } = useOutletContext();
 
@@ -48,6 +52,20 @@ const DataUser = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    if (location.state?.message) {
+      setToastMessage(location.state.message);
+
+      navigate(location.pathname, { replace: true, state: {} });
+
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [location, navigate]);
+
   async function handleDelete(id) {
     if (
       window.confirm(
@@ -59,11 +77,11 @@ const DataUser = () => {
           method: 'DELETE',
         });
 
-        alert(data.message);
+        setToastMessage(data.message || 'Data berhasil dihapus');
         setUsersData((prevUsers) => prevUsers.filter((user) => user.id !== id));
       } catch (error) {
-        if (err instanceof APIError) {
-          if (err.status === 401) {
+        if (error instanceof APIError) {
+          if (error.status === 401) {
             alert('Sesi Anda telah berakhir. Silakan login kembali.');
             navigate('/login');
           } else {
@@ -75,8 +93,27 @@ const DataUser = () => {
       }
     }
   }
+
   return (
     <div>
+      {toastMessage && (
+        <div className="toast-container position-fixed top-0 end-0 p-3" style={{ zIndex: 11 }}>
+          <div
+            className="toast show align-items-center text-white bg-success border-0"
+            role="alert"
+          >
+            <div className="d-flex">
+              <div className="toast-body">{toastMessage}</div>
+              <button
+                type="button"
+                className="btn-close btn-close-white me-2 m-auto"
+                onClick={() => setToastMessage(null)}
+              ></button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="card p-4 table-responsive">
         <Link to="/admin/tambah-user" className="btn btn-primary mb-3">
           Tambah
@@ -115,29 +152,37 @@ const DataUser = () => {
                 ))}
               </>
             )}
-            {error && (
+
+            {!isFetching && error && (
               <tr>
-                <td colSpan="5" className="text-center py-4">
+                <td colSpan="5" className="text-center py-4 text-danger">
                   {error}
                 </td>
               </tr>
             )}
-            {usersData.map((user, index) => (
-              <tr key={user.id}>
-                <th scope="row">{index + 1}</th>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td className="d-flex gap-2">
-                  <Link to={`/admin/edit-user/${user.id}`} className="btn btn-warning text-dark">
-                    Edit
-                  </Link>
-                  <a href="#" className="btn btn-danger" onClick={() => handleDelete(user.id)}>
-                    Hapus
-                  </a>
-                </td>
-              </tr>
-            ))}
+
+            {!isFetching &&
+              !error &&
+              usersData.map((user, index) => (
+                <tr key={user.id}>
+                  <th scope="row">{index + 1}</th>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td className="d-flex gap-2">
+                    <Link to={`/admin/edit-user/${user.id}`} className="btn btn-warning text-dark">
+                      Edit
+                    </Link>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
