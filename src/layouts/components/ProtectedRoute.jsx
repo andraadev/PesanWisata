@@ -1,7 +1,8 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useOutletContext } from 'react-router-dom';
 
 const ProtectedRoute = ({ allowedRoles }) => {
+  const context = useOutletContext();
   const token = localStorage.getItem('token');
 
   let user = null;
@@ -21,7 +22,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />;
+  return <Outlet context={context} />;
 };
 
 export default ProtectedRoute;
