@@ -97,118 +97,148 @@ const Booking = () => {
   };
 
   return (
-    <div>
+    <div className="container py-4">
       {error && (
-        <div className="alert alert-danger mt-3" role="alert">
+        <div className="alert alert-danger mb-4" role="alert">
           {error}
         </div>
       )}
+
       {isFetching ? (
-        <div className="card p-4 placeholder-glow">
-          <div className="row mb-3">
-            <div className="col-sm-12 col-md-6">
-              <label className="form-label">Tanggal Booking</label>
-              <div
-                className="form-control placeholder col-12 placeholder-wave"
-                style={{ height: '38px' }}
-              ></div>
-            </div>
-            <div className="col-sm-12 col-md-6">
-              <label className="form-label">Nama Kamu</label>
-              <div
-                className="form-control placeholder col-12 placeholder-wave"
-                style={{ height: '38px' }}
-              ></div>
-            </div>
-          </div>
-          <div className="row mb-3">
-            <div className="col-sm-12 col-md-6">
-              <label className="form-label">Destinasi Tujuan</label>
-              <div
-                className="form-control placeholder col-12 placeholder-wave"
-                style={{ height: '38px' }}
-              ></div>
-            </div>
-            <div className="col-sm-12 col-md-6">
-              <label className="form-label">Status</label>
-              <div
-                className="form-control placeholder col-12 placeholder-wave"
-                style={{ height: '38px' }}
-              ></div>
-            </div>
-          </div>
-          <div className="placeholder py-3 rounded btn-primary"></div>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="form-wrapper card p-4">
-          <div className="row mb-3">
-            <div className="col-sm-12 col-md-6">
-              <label htmlFor="booking_date" className="form-label">
-                Tanggal Booking
-              </label>
-              <input
-                type="date"
-                name="booking_date"
-                id="booking_date"
-                className={`form-control ${validationErrors.booking_date ? 'is-invalid' : ''}`}
-                value={formData.booking_date}
-                onChange={handleChange}
-              />
-              {validationErrors.booking_date && (
-                <div className="invalid-feedback">{validationErrors.booking_date[0]}</div>
-              )}
-            </div>
-
-            <div className="col-sm-12 col-md-6">
-              <label htmlFor="user_id" className="form-label">
-                Nama Kamu
-              </label>
-              <input
-                type="text"
-                id="user_name"
-                className="form-control"
-                value={currentUser?.name || ''}
-                disabled
-              />
-            </div>
-          </div>
-
-          <div className="row mb-3">
-            <div className="col-sm-12 col-md-6">
-              <label htmlFor="destinasi_tujuan" className="form-label">
-                Destinasi Tujuan
-              </label>
-              <input
-                type="text"
-                value={destination?.name || ''}
-                className="form-control"
-                disabled
-              />
-            </div>
-
-            <div className="col-sm-12 col-md-6">
-              <label htmlFor="status" className="form-label">
-                Status
-              </label>
-              <div>
-                <input
-                  type="radio"
-                  name="status"
-                  id="status"
-                  checked={formData.status === 'Selesai'}
-                  className="form-check-input me-2"
-                  value="Selesai"
-                  onChange={handleChange}
-                />
-                <label htmlFor="status">Selesai</label>
+        <div className="row g-4 placeholder-glow">
+          <div className="col-12 col-md-8">
+            <div className="card p-4 border-0 shadow-sm">
+              <div className="row mb-3">
+                <div className="col-sm-12 col-md-6 mb-3">
+                  <div className="placeholder col-4 mb-2"></div>
+                  <div className="placeholder col-12 py-3 rounded"></div>
+                </div>
+                <div className="col-sm-12 col-md-6 mb-3">
+                  <div className="placeholder col-4 mb-2"></div>
+                  <div className="placeholder col-12 py-3 rounded"></div>
+                </div>
+              </div>
+              <div className="row mb-3">
+                <div className="col-sm-12 col-md-6">
+                  <div className="placeholder col-3 mb-2"></div>
+                  <div className="placeholder col-6 py-2 rounded"></div>
+                </div>
+              </div>
+              <div className="d-flex justify-content-end gap-2">
+                <div className="placeholder col-2 py-2 rounded"></div>
+                <div className="placeholder col-3 py-2 rounded"></div>
               </div>
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Memproses...' : 'Reservasi'}
-          </button>
-        </form>
+          <div className="col-12 col-md-4">
+            <div className="card border-0 shadow-sm overflow-hidden">
+              <div className="placeholder col-12" style={{ height: '180px' }}></div>
+              <div className="card-body">
+                <h5 className="placeholder col-8 mb-2"></h5>
+                <p className="placeholder col-10 mb-3"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="row g-4">
+          <div className="col-12 col-md-8">
+            <form onSubmit={handleSubmit} className="card p-4 border-0 shadow-sm">
+              <div className="row mb-3">
+                <div className="col-sm-12 col-md-6 mb-3">
+                  <label htmlFor="user_name" className="form-label text-muted">
+                    Nama Pemesan
+                  </label>
+                  <input
+                    type="text"
+                    id="user_name"
+                    className="form-control bg-light"
+                    value={currentUser?.name || ''}
+                    disabled
+                  />
+                </div>
+
+                <div className="col-sm-12 col-md-6 mb-3">
+                  <label htmlFor="booking_date" className="form-label fw-medium">
+                    Tanggal Booking
+                  </label>
+                  <input
+                    type="date"
+                    name="booking_date"
+                    id="booking_date"
+                    className={`form-control ${validationErrors.booking_date ? 'is-invalid' : ''}`}
+                    value={formData.booking_date}
+                    onChange={handleChange}
+                  />
+                  {validationErrors.booking_date && (
+                    <div className="invalid-feedback">{validationErrors.booking_date[0]}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-sm-12 col-md-6">
+                  <label className="form-label d-block text-muted">Status</label>
+                  <div className="form-check form-check-inline">
+                    <input
+                      type="radio"
+                      name="status"
+                      id="status_selesai"
+                      checked={formData.status === 'Selesai'}
+                      className="form-check-input"
+                      value="Selesai"
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="status_selesai" className="form-check-label">
+                      Selesai
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="d-flex justify-content-end gap-2">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary px-4"
+                  onClick={() => navigate(-1)}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-success px-4"
+                  disabled={isSubmitting || !destination}
+                >
+                  {isSubmitting ? 'Memproses...' : 'Ajukan Reservasi'}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="col-12 col-md-4">
+            <div className="card border-0 shadow-sm overflow-hidden">
+              <img
+                src={destination?.image_url || 'https://via.placeholder.com/400x200'}
+                alt={destination?.name || 'Destinasi'}
+                className="card-img-top object-fit-cover"
+                style={{ height: '180px' }}
+              />
+              <div className="card-body">
+                <h5 className="card-title fw-bold">
+                  {destination?.name || 'Destinasi Tidak Ditemukan'}
+                  {destination?.location && (
+                    <span className="badge text-bg-primary ms-2">{destination.location}</span>
+                  )}
+                </h5>
+
+                <p className="card-text text-muted small mb-3">
+                  {destination?.description || 'Deskripsi tidak tersedia'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
