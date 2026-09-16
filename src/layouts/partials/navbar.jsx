@@ -77,6 +77,11 @@ const Navbar = () => {
                     Data Destinasi
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admin/data-reservasi">
+                    Data Reservasi
+                  </NavLink>
+                </li>
               </>
             )}
 

@@ -16,6 +16,7 @@ import Booking from './pages/booking';
 import AuthLayout from './layouts/auth';
 import AdminLayout from './layouts/admin';
 import ProtectedRoute from './layouts/components/ProtectedRoute';
+import BookingData from './pages/admin/booking_data';
 
 function App() {
   return (
@@ -44,7 +45,7 @@ function App() {
             <Route path="/admin/data-destinasi" element={<DataDestinasi />} />
             <Route path="/admin/tambah-destinasi" element={<TambahDestinasi />} />
             <Route path="/admin/edit-destinasi/:id" element={<EditDataDestinasi />} />
-            <Route path="/admin/data-booking" element={<DataBooking />} />
+            <Route path="/admin/data-reservasi" element={<BookingData />} />
           </Route>
         </Route>
       </Routes>
