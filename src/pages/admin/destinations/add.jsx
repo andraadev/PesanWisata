@@ -15,17 +15,36 @@ const TambahDestinasi = () => {
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     setPageTitle('Tambah Data Destinasi');
   }, [setPageTitle]);
 
+  // const handleChange = (e) => {
+  //   const { name, type, value, files } = e.target;
+  //   if (type === 'file') {
+  //     setFormData({ ...formData, [name]: files[0] });
+  //   } else {
+  //     setFormData({ ...formData, [name]: value });
+  //   }
+  // };
+
   const handleChange = (e) => {
     const { name, type, value, files } = e.target;
     if (type === 'file') {
-      setFormData({ ...formData, [name]: files[0] });
+      const selectedFile = files[0];
+      setFormData((prev) => ({ ...prev, [name]: selectedFile }));
+
+      if (selectedFile) {
+        if (imagePreview) URL.revokeObjectURL(imagePreview);
+        setImagePreview(URL.createObjectURL(selectedFile));
+      } else {
+        if (imagePreview) URL.revokeObjectURL(imagePreview);
+        setImagePreview(null);
+      }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -149,6 +168,17 @@ const TambahDestinasi = () => {
                 <div className="invalid-feedback">{validationErrors.image_url[0]}</div>
               )}
             </div>
+            {imagePreview && (
+              <div className="mb-3">
+                <p className="text-muted d-block mb-1">Pratinjau Gambar:</p>
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="img-thumbnail object-fit-cover"
+                  style={{ maxHeight: '120px', maxWidth: '200px' }}
+                />
+              </div>
+            )}
           </div>
           <button type="submit" className="btn btn-primary mb-3" disabled={isSubmitting}>
             {isSubmitting ? 'Memproses...' : 'Tambah'}
