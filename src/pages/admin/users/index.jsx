@@ -52,19 +52,23 @@ const DataUser = () => {
     fetchUsers();
   }, []);
 
+  // For Display Toast Message
   useEffect(() => {
     if (location.state?.message) {
       setToastMessage(location.state.message);
-
       navigate(location.pathname, { replace: true, state: {} });
-
-      const timer = setTimeout(() => {
-        setToastMessage(null);
-      }, 3000);
-
-      return () => clearTimeout(timer);
     }
   }, [location, navigate]);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timer = setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
 
   async function handleDelete(id) {
     if (
