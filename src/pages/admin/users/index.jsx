@@ -71,11 +71,7 @@ const DataUser = () => {
   }, [toastMessage]);
 
   async function handleDelete(id) {
-    if (
-      window.confirm(
-        'Apakah anda yakin? Tindakan ini mungkin memengaruhi data user ini di tabel lain.'
-      )
-    ) {
+    if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
       try {
         const data = await fetchAPI(`/admin/users/${id}`, {
           method: 'DELETE',
