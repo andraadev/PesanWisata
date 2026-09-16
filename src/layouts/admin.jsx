@@ -6,11 +6,15 @@ import Footer from './partials/footer';
 const AdminLayout = () => {
   const location = useLocation();
   const [pageTitle, setPageTitle] = useState('Pesan Wisata');
-  const [pageSubtitle, setPageSubtitle] = useState('');
+  const [pageSubtitle, setPageSubtitle] = useState(null);
 
   useEffect(() => {
     document.title = `${pageTitle} | PesanWisata`;
   }, [pageTitle]);
+
+  useEffect(() => {
+    setPageSubtitle(null);
+  }, [location.pathname]);
 
   return (
     <div className="d-flex flex-column min-vh-100">
