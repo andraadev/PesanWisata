@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext, Link } from 'react-router-dom';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const EditUser = () => {
@@ -96,9 +96,9 @@ const EditUser = () => {
 
   return (
     <div>
-      <a href="/admin/data-user" className="btn btn-secondary mb-3">
+      <Link to="/admin/data-user" className="btn btn-secondary mb-3">
         Kembali ke Halaman Data User
-      </a>
+      </Link>
       <div className="card p-4">
         {error && (
           <div className="alert alert-danger mt-3" role="alert">

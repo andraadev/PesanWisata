@@ -69,9 +69,9 @@ const TambahDataUser = () => {
 
   return (
     <div>
-      <a href="/admin/data-user" className="btn btn-secondary mb-3">
+      <Link to="/admin/data-user" className="btn btn-secondary mb-3">
         Kembali ke Halaman Data User
-      </a>
+      </Link>
       <div className="card p-4">
         {error && (
           <div className="alert alert-danger mt-3" role="alert">
