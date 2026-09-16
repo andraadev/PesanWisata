@@ -63,7 +63,7 @@ const Navbar = () => {
             {token && role === 'Admin' && (
               <>
                 <li className="nav-item">
-                  <NavLink className="nav-link active" aria-current="page" to="/admin/beranda">
+                  <NavLink className="nav-link" aria-current="page" to="/admin/beranda">
                     Beranda
                   </NavLink>
                 </li>
