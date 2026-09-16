@@ -8,7 +8,7 @@ const EditUser = () => {
   const [isFetching, setIsFetching] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState({});
   const { setPageTitle } = useOutletContext();
 
   const [user, setUser] = useState({
@@ -55,7 +55,7 @@ const EditUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setErrors({});
+    setValidationErrors({});
 
     const payload = {
       name: user.name,
@@ -80,9 +80,10 @@ const EditUser = () => {
         });
       }
     } catch (error) {
+      setIsSubmitting(false);
       if (error instanceof APIError) {
         if (error.status === 422) {
-          setErrors(error.errors || {});
+          setValidationErrors(error.errors || {});
         } else if (error.status === 401) {
           setError('Sesi Anda telah berakhir. Silakan login kembali.');
         } else {
@@ -159,12 +160,14 @@ const EditUser = () => {
                   type="text"
                   name="name"
                   id="nama_lengkap"
-                  className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                  className={`form-control ${validationErrors.name ? 'is-invalid' : ''}`}
                   value={user.name}
                   onChange={handleChange}
                   autoFocus
                 />
-                {errors.name && <div className="invalid-feedback">{errors.name[0]}</div>}
+                {validationErrors.name && (
+                  <div className="invalid-feedback">{validationErrors.name[0]}</div>
+                )}
               </div>
               <div id="input-group" className="col-sm-12 col-md-6 mb-3">
                 <label htmlFor="email" className="form-label">
@@ -174,11 +177,13 @@ const EditUser = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                  className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
                   value={user.email}
                   onChange={handleChange}
                 />
-                {errors.email && <div className="invalid-feedback">{errors.email[0]}</div>}
+                {validationErrors.email && (
+                  <div className="invalid-feedback">{validationErrors.email[0]}</div>
+                )}
               </div>
             </div>
             <div className="row">
@@ -191,16 +196,18 @@ const EditUser = () => {
                   name="password"
                   id="password"
                   placeholder="Kosongkan jika tidak ingin mengubah"
-                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                  className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
                   onChange={handleChange}
                 />
-                {errors.password && <div className="invalid-feedback">{errors.password[0]}</div>}
+                {validationErrors.password && (
+                  <div className="invalid-feedback">{validationErrors.password[0]}</div>
+                )}
               </div>
               <div id="input-group" className="col-sm-12 col-md-6 mb-3">
                 <label className="form-label">Role</label>
                 <select
                   name="role"
-                  className={`form-select ${errors.role ? 'is-invalid' : ''}`}
+                  className={`form-select ${validationErrors.role ? 'is-invalid' : ''}`}
                   value={user.role}
                   onChange={handleChange}
                 >
@@ -208,7 +215,9 @@ const EditUser = () => {
                   <option value="Admin">Admin</option>
                   <option value="User">User</option>
                 </select>
-                {errors.role && <div className="invalid-feedback">{errors.role[0]}</div>}
+                {validationErrors.role && (
+                  <div className="invalid-feedback">{validationErrors.role[0]}</div>
+                )}
               </div>
             </div>
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
