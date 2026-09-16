@@ -34,10 +34,8 @@ const Login = () => {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         if (user?.role === 'Admin') {
-          alert(`Selamat datang kembali, Admin ${user.name}!`);
           navigate('/admin/beranda');
         } else {
-          alert(`Login berhasil! Selamat datang, ${user.name}.`);
           navigate('/');
         }
       }

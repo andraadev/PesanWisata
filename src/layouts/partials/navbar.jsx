@@ -22,7 +22,6 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    alert('Berhasil keluar.');
     navigate('/login');
   };
 
