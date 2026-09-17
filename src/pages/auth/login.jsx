@@ -7,7 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const { setPageTitle, setPageSubtitle } = useOutletContext();
@@ -21,9 +21,9 @@ const Login = () => {
     e.preventDefault();
     setError(null);
     setValidationErrors({});
-    setLoading(true);
 
     try {
+      setIsSubmitting(true);
       const response = await fetchAPI('/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
@@ -39,18 +39,17 @@ const Login = () => {
           navigate('/');
         }
       }
-    } catch (err) {
-      if (err instanceof APIError) {
-        if (err.status === 422) {
-          setValidationErrors(err.errors || {});
+    } catch (error) {
+      setIsSubmitting(false);
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
         } else {
-          setError(err.message || 'Login Gagal');
+          setError('Login gagal, silakan coba lagi nanti.');
         }
       } else {
-        setError('Terjadi Masalah pada Sistem.');
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
       }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -98,8 +97,8 @@ const Login = () => {
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Memproses...' : 'Masuk'}
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+          {isSubmitting ? 'Memproses...' : 'Masuk'}
         </button>
         <p className="register-account text-center mt-3">
           Tidak memiliki akun? <Link to="/register">Buat akun baru</Link> untuk memulai.
