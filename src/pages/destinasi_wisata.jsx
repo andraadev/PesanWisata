@@ -93,7 +93,7 @@ const DestinasiWisata = () => {
             <div className="card-body">
               <h5 className="card-title">
                 {destinasi.name}
-                <span className="badge text-bg-primary">Bali</span>
+                <span className="badge text-bg-primary">{destinasi.location}</span>
               </h5>
               <p className="card-text description">{destinasi.description}</p>
               <Link to={`/booking/${destinasi.slug}`} className="btn btn-primary w-100">
