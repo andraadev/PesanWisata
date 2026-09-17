@@ -44,7 +44,7 @@ const Navbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="nav nav-underline me-auto mb-2 mb-lg-0">
+          <ul className="navbar-nav nav-underline flex-column flex-lg-row me-auto mb-lg-0">
             {role !== 'Admin' && (
               <>
                 <li className="nav-item">
