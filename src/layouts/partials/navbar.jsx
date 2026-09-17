@@ -44,16 +44,16 @@ const Navbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0 ">
+          <ul className="nav nav-underline me-auto mb-2 mb-lg-0">
             {role !== 'Admin' && (
               <>
                 <li className="nav-item">
-                  <NavLink to="/" className="nav-link">
+                  <NavLink to="/" className="nav-link text-dark">
                     Beranda
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/destinasi" className="nav-link">
+                  <NavLink to="/destinasi" className="nav-link text-dark">
                     Destinasi Wisata
                   </NavLink>
                 </li>
@@ -62,22 +62,22 @@ const Navbar = () => {
             {token && role === 'Admin' && (
               <>
                 <li className="nav-item">
-                  <NavLink className="nav-link" aria-current="page" to="/admin/beranda">
+                  <NavLink className="nav-link text-dark" aria-current="page" to="/admin/beranda">
                     Beranda
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin/data-user">
+                  <NavLink className="nav-link text-dark" to="/admin/data-user">
                     Data User
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin/data-destinasi">
+                  <NavLink className="nav-link text-dark" to="/admin/data-destinasi">
                     Data Destinasi
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin/data-reservasi">
+                  <NavLink className="nav-link text-dark" to="/admin/data-reservasi">
                     Data Reservasi
                   </NavLink>
                 </li>
@@ -86,7 +86,7 @@ const Navbar = () => {
 
             {token && role === 'User' && (
               <li className="nav-item">
-                <NavLink to="/data-booking" className="nav-link">
+                <NavLink to="/data-booking" className="nav-link text-dark">
                   Reservasi Saya
                 </NavLink>
               </li>
