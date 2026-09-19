@@ -80,25 +80,28 @@ const DestinasiWisata = () => {
   }
 
   return (
-    <div>
-      <section className="destination-cards-wrapper container-fluid row grid gap-5">
+    <div className="container-fluid">
+      <section className="destination-cards-wrapper row g-4">
         {destinasiData.map((destinasi) => (
-          <div key={destinasi.id} className="card col-4 col-sm-12 p-0" style={{ width: '18rem' }}>
-            <img
-              src={destinasi.image_url}
-              className="card-img-top"
-              alt={destinasi.name}
-              loading="lazy"
-            />
-            <div className="card-body">
-              <h5 className="card-title">
-                {destinasi.name}
-                <span className="badge text-bg-primary">{destinasi.location}</span>
-              </h5>
-              <p className="card-text description">{destinasi.description}</p>
-              <Link to={`/booking/${destinasi.slug}`} className="btn btn-primary w-100">
-                Pilih
-              </Link>
+          <div key={destinasi.id} className="col-12 col-md-6 col-lg-4">
+            <div className="card h-100">
+              <img
+                src={destinasi.image_url}
+                className="card-img-top"
+                alt={destinasi.name}
+                loading="lazy"
+                style={{ height: '200px', objectFit: 'cover' }}
+              />
+              <div className="card-body">
+                <h5 className="card-title">
+                  {destinasi.name}
+                  <span className="badge text-bg-primary">{destinasi.location}</span>
+                </h5>
+                <p className="card-text description">{destinasi.description}</p>
+                <Link to={`/booking/${destinasi.slug}`} className="btn btn-primary w-100">
+                  Pilih
+                </Link>
+              </div>
             </div>
           </div>
         ))}
