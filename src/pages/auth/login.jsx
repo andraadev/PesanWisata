@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
-import { fetchAPI, APIError } from '../../services/api';
+import { fetchAPI, APIError, getCsrfCookie } from '../../services/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,18 +21,19 @@ const Login = () => {
     e.preventDefault();
     setError(null);
     setValidationErrors({});
+    setIsSubmitting(true);
 
     try {
-      setIsSubmitting(true);
+      await getCsrfCookie();
+
       const response = await fetchAPI('/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: { email, password },
       });
 
-      if (response?.success) {
+      if (response?.success === true) {
         const user = response.data.user;
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('user', JSON.stringify(user));
         if (user?.role === 'Admin') {
           navigate('/admin/beranda');
         } else {
@@ -40,7 +41,6 @@ const Login = () => {
         }
       }
     } catch (error) {
-      setIsSubmitting(false);
       if (error instanceof APIError) {
         if (error.status === 422) {
           setValidationErrors(error.errors || {});
@@ -50,6 +50,8 @@ const Login = () => {
       } else {
         setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
