@@ -1,9 +1,8 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+
 const Navbar = () => {
   const navigate = useNavigate();
-
-  const token = localStorage.getItem('token');
 
   const getUserData = () => {
     try {
@@ -17,12 +16,26 @@ const Navbar = () => {
   };
 
   const user = getUserData();
-  const role = user?.role; // 'Admin', 'User', or undefined (Tamu)
+  const role = user?.role;
+  const isAuthenticated = !!user;
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      const data = await fetchAPI('/logout', {
+        method: 'POST',
+      });
+    } catch (error) {
+      if (error instanceof APIError) {
+        if (error.status !== 401) {
+          console.error('Gagal logout dari server:', error.message);
+        }
+      } else {
+        console.error('Tidak dapat terhubung ke server saat logout:', error);
+      }
+    } finally {
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
   };
 
   return (
@@ -30,7 +43,7 @@ const Navbar = () => {
       <div className="container-fluid">
         <Link to="/" className="navbar-brand fw-bolder">
           PesanWisata
-          {role === 'Admin' && <span className="badge text-bg-primary ms-2">Admin</span>}{' '}
+          {role === 'Admin' && <span className="badge text-bg-primary ms-2">Admin</span>}
         </Link>
         <button
           className="navbar-toggler"
@@ -59,7 +72,8 @@ const Navbar = () => {
                 </li>
               </>
             )}
-            {token && role === 'Admin' && (
+
+            {isAuthenticated && role === 'Admin' && (
               <>
                 <li className="nav-item">
                   <NavLink className="nav-link text-dark" aria-current="page" to="/admin/beranda">
@@ -84,7 +98,7 @@ const Navbar = () => {
               </>
             )}
 
-            {token && role === 'User' && (
+            {isAuthenticated && role === 'User' && (
               <li className="nav-item">
                 <NavLink to="/data-booking" className="nav-link text-dark">
                   Reservasi Saya
@@ -92,8 +106,9 @@ const Navbar = () => {
               </li>
             )}
           </ul>
+
           <div className="button-wrapper d-flex align-items-center gap-2">
-            {token ? (
+            {isAuthenticated ? (
               <>
                 <span className="me-2">Halo, {user?.name}</span>
                 <button onClick={handleLogout} className="btn btn-danger">
