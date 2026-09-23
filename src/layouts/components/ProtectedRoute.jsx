@@ -3,17 +3,16 @@ import { Navigate, Outlet, useOutletContext } from 'react-router-dom';
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const context = useOutletContext();
-  const token = localStorage.getItem('token');
 
   let user = null;
   try {
     const savedUser = localStorage.getItem('user');
     user = savedUser && savedUser !== 'undefined' ? JSON.parse(savedUser) : null;
-  } catch (err) {
+  } catch (error) {
     user = null;
   }
 
-  if (!token) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
