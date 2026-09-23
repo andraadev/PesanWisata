@@ -3,19 +3,32 @@ export class APIError extends Error {
         super(message);
         this.name = 'APIError';
         this.status = status;
-        this.errors = errors; // Tempat menampung error validasi Laravel (422)
+        this.errors = errors;
     }
 }
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
+export const getCsrfCookie = async () => {
+    await fetch(`${SERVER_URL}/sanctum/csrf-cookie`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+        credentials: "include",
+    });
+};
 
 export const fetchAPI = async (endpoint, options = {}) => {
     const isFormData = options.body instanceof FormData;
-    const token = localStorage.getItem('token');
+
+    const csrfToken = getCookie('XSRF-TOKEN');
+    const method = options.method || 'GET';
 
     const headers = {
         'Accept': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...(csrfToken && { 'X-XSRF-TOKEN': decodeURIComponent(csrfToken) }),
         ...options.headers,
     };
 
@@ -28,10 +41,12 @@ export const fetchAPI = async (endpoint, options = {}) => {
         formattedBody = JSON.stringify(options.body);
     }
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
+        method,
         headers,
         body: formattedBody,
+        credentials: 'include',
     });
 
     if (response.status === 204) {
@@ -43,8 +58,17 @@ export const fetchAPI = async (endpoint, options = {}) => {
     const data = isJson ? await response.json() : null;
 
     if (!response.ok) {
-        const errorMessage = data?.message || `Terjadi kesalahan server (${response.status})`;
+        if (response.status === 401) {
+            localStorage.removeItem('user');
 
+            if (!window.location.pathname.startsWith('/login')) {
+                window.location.href = '/login';
+            }
+
+            throw new APIError('Sesi kamu telah berakhir. Silakan login kembali.', 401);
+        }
+
+        const errorMessage = data?.message || `Terjadi kesalahan server (${response.status})`;
         const validationErrors = response.status === 422
             ? (data?.errors || data || null)
             : (data?.errors || null);
@@ -54,3 +78,10 @@ export const fetchAPI = async (endpoint, options = {}) => {
 
     return data;
 };
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
