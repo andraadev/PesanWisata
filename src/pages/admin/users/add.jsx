@@ -51,7 +51,6 @@ const TambahDataUser = () => {
         });
       }
     } catch (error) {
-      setIsSubmitting(false);
       if (error instanceof APIError) {
         if (error.status === 422) {
           setValidationErrors(error.errors || {});
@@ -63,6 +62,8 @@ const TambahDataUser = () => {
       } else {
         setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
