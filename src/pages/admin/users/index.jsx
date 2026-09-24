@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchAPI, APIError } from '../../../services/api';
 import Notification from '../../../layouts/components/Notification';
+import TableSkeleton from '../../../layouts/components/TableSkeleton';
 
 const DataUser = () => {
   const [usersData, setUsersData] = useState([]);
@@ -112,29 +113,7 @@ const DataUser = () => {
               </tr>
             </thead>
             <tbody>
-              {isFetching && (
-                <>
-                  {[...Array(5)].map((_, i) => (
-                    <tr key={`skeleton-${i}`}>
-                      <th scope="row">
-                        <span className="placeholder col-12 placeholder-wave"></span>
-                      </th>
-                      <td>
-                        <span className="placeholder col-12 placeholder-wave"></span>
-                      </td>
-                      <td>
-                        <span className="placeholder col-12 placeholder-wave"></span>
-                      </td>
-                      <td>
-                        <span className="placeholder col-12 placeholder-wave"></span>
-                      </td>
-                      <td>
-                        <span className="placeholder col-12 placeholder-wave"></span>
-                      </td>
-                    </tr>
-                  ))}
-                </>
-              )}
+              {isFetching && <TableSkeleton columns={5} />}
 
               {!isFetching && error && (
                 <tr>
