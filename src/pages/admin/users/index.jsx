@@ -57,14 +57,6 @@ const DataUser = () => {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location, navigate]);
-  //   if (!toastMessage) return;
-
-  //   const timer = setTimeout(() => {
-  //     setToastMessage(null);
-  //   }, 3000);
-
-  //   return () => clearTimeout(timer);
-  // }, [toastMessage]);
 
   async function handleDelete(id) {
     if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
