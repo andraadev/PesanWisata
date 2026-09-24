@@ -40,7 +40,6 @@ const EditDataDestinasi = () => {
           setOldImage(response.data.image_url || null);
         }
       } catch (error) {
-        console.error('[Fetch Destination Error]:', error);
         setError('Gagal mengambil data destinasi. Silakan coba lagi nanti');
       } finally {
         setIsFetching(false);
