@@ -110,77 +110,90 @@ const DataUser = () => {
         </div>
       )}
 
-      <div className="card p-4 table-responsive">
-        <Link to="/admin/tambah-user" className="btn btn-primary mb-3">
-          Tambah
-        </Link>
-        <table className="table table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">No</th>
-              <th scope="col">Nama Lengkap</th>
-              <th scope="col">Email</th>
-              <th scope="col">Role</th>
-              <th scope="col">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isFetching && (
-              <>
-                {[...Array(5)].map((_, i) => (
-                  <tr key={`skeleton-${i}`}>
-                    <th scope="row">
-                      <span className="placeholder col-12 placeholder-wave"></span>
-                    </th>
+      <div className="card">
+        <div className="card-header">
+          <Link to="/admin/tambah-user" className="btn btn-primary">
+            Tambah
+          </Link>
+        </div>
+        <div className="card-body table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama Lengkap</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isFetching && (
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <tr key={`skeleton-${i}`}>
+                      <th scope="row">
+                        <span className="placeholder col-12 placeholder-wave"></span>
+                      </th>
+                      <td>
+                        <span className="placeholder col-12 placeholder-wave"></span>
+                      </td>
+                      <td>
+                        <span className="placeholder col-12 placeholder-wave"></span>
+                      </td>
+                      <td>
+                        <span className="placeholder col-12 placeholder-wave"></span>
+                      </td>
+                      <td>
+                        <span className="placeholder col-12 placeholder-wave"></span>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
+
+              {!isFetching && error && (
+                <tr>
+                  <td colSpan="5" className="text-center py-4 text-danger">
+                    {error}
+                  </td>
+                </tr>
+              )}
+
+              {!isFetching &&
+                !error &&
+                usersData.map((user, index) => (
+                  <tr key={user.id}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
                     <td>
-                      <span className="placeholder col-12 placeholder-wave"></span>
+                      <span
+                        className={`badge text-bg-${user.role === 'Admin' ? 'primary' : 'secondary'}`}
+                      >
+                        {user.role}
+                      </span>
                     </td>
-                    <td>
-                      <span className="placeholder col-12 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-12 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-12 placeholder-wave"></span>
+                    <td className="d-flex gap-2">
+                      <Link
+                        to={`/admin/edit-user/${user.id}`}
+                        className="btn btn-warning text-dark"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        Hapus
+                      </button>
                     </td>
                   </tr>
                 ))}
-              </>
-            )}
-
-            {!isFetching && error && (
-              <tr>
-                <td colSpan="5" className="text-center py-4 text-danger">
-                  {error}
-                </td>
-              </tr>
-            )}
-
-            {!isFetching &&
-              !error &&
-              usersData.map((user, index) => (
-                <tr key={user.id}>
-                  <th scope="row">{index + 1}</th>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td className="d-flex gap-2">
-                    <Link to={`/admin/edit-user/${user.id}`} className="btn btn-warning text-dark">
-                      Edit
-                    </Link>
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      Hapus
-                    </button>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
