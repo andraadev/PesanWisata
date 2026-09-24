@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchAPI, APIError } from '../../../services/api';
+import Notification from '../../../layouts/components/Notification';
 
 const DataUser = () => {
   const [usersData, setUsersData] = useState([]);
@@ -55,16 +56,14 @@ const DataUser = () => {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location, navigate]);
+  //   if (!toastMessage) return;
 
-  useEffect(() => {
-    if (!toastMessage) return;
+  //   const timer = setTimeout(() => {
+  //     setToastMessage(null);
+  //   }, 3000);
 
-    const timer = setTimeout(() => {
-      setToastMessage(null);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [toastMessage]);
+  //   return () => clearTimeout(timer);
+  // }, [toastMessage]);
 
   async function handleDelete(id) {
     if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
@@ -93,23 +92,8 @@ const DataUser = () => {
   return (
     <div>
       {toastMessage && (
-        <div className="toast-container position-fixed top-0 end-0 p-3" style={{ zIndex: 11 }}>
-          <div
-            className="toast show align-items-center text-white bg-success border-0"
-            role="alert"
-          >
-            <div className="d-flex">
-              <div className="toast-body">{toastMessage}</div>
-              <button
-                type="button"
-                className="btn-close btn-close-white me-2 m-auto"
-                onClick={() => setToastMessage(null)}
-              ></button>
-            </div>
-          </div>
-        </div>
+        <Notification message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
-
       <div className="card">
         <div className="card-header">
           <Link to="/admin/tambah-user" className="btn btn-primary">
