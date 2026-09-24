@@ -28,10 +28,6 @@ const DataUser = () => {
         if (Array.isArray(result?.data)) {
           setUsersData(result.data);
         } else {
-          console.error(
-            '[Fetch Users Error]: Expecting array in response.data, got:',
-            result?.data
-          );
           setError('Gagal menampilkan data user. Silakan segarkan (refresh) halaman.');
         }
       } catch (error) {
