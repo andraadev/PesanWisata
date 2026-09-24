@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchAPI, APIError } from '../../../services/api';
 import Notification from '../../../layouts/components/Notification';
+import TableSkeleton from '../../../layouts/components/TableSkeleton';
 
 const DataDestinasi = () => {
   const navigate = useNavigate();
@@ -35,10 +36,6 @@ const DataDestinasi = () => {
         if (Array.isArray(result?.data)) {
           setDestinationsData(result.data);
         } else {
-          console.error(
-            '[Fetch Destinations Error]: Expecting array in response.data, got:',
-            result?.data
-          );
           setError('Gagal menampilkan data destinasi. Silakan segarkan (refresh) halaman.');
         }
       } catch (error) {
@@ -84,93 +81,72 @@ const DataDestinasi = () => {
       }
     }
   }
-  if (error)
-    return (
-      <div className="alert alert-danger mt-5" role="alert">
-        Error = {error}
-      </div>
-    );
+
   return (
     <div>
       {toastMessage && (
         <Notification message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
 
-      <div className="card p-4 table-responsive">
-        <Link to="/admin/tambah-destinasi" className="btn btn-primary mb-3">
-          Tambah
-        </Link>
-        <table className="table table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">No</th>
-              <th scope="col">Nama</th>
-              <th scope="col">Lokasi</th>
-              <th scope="col">Deskripsi</th>
-              <th scope="col">Gambar</th>
-              <th scope="col">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isFetching && (
-              <>
-                {[...Array(5)].map((_, i) => (
-                  <tr key={`skeleton-${i}`}>
-                    <th scope="row">
-                      <span className="placeholder col-3 placeholder-wave"></span>
-                    </th>
+      <div className="card">
+        <div className="card-header">
+          <Link to="/admin/tambah-destinasi" className="btn btn-primary">
+            Tambah
+          </Link>
+        </div>
+        <div className="card-body table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama</th>
+                <th scope="col">Lokasi</th>
+                <th scope="col">Deskripsi</th>
+                <th scope="col">Gambar</th>
+                <th scope="col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isFetching && <TableSkeleton columns={6} />}
+
+              {!isFetching && error && (
+                <tr>
+                  <td colSpan="5" className="text-center py-4 text-danger">
+                    {error}
+                  </td>
+                </tr>
+              )}
+              {!isFetching &&
+                !error &&
+                destinationsData.map((destination, index) => (
+                  <tr key={destination.id}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{destination.name}</td>
+                    <td>{destination.location}</td>
+                    <td>{destination.description}</td>
                     <td>
-                      <span className="placeholder col-8 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-10 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-9 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-9 placeholder-wave"></span>
+                      <img src={destination.image_url} alt={destination.name} width={100} />
                     </td>
                     <td className="d-flex gap-2">
-                      <button className="btn btn-warning" disabled>
+                      <Link
+                        to={`/admin/edit-destinasi/${destination.id}`}
+                        className="btn btn-warning text-dark"
+                      >
                         Edit
-                      </button>
-                      <button className="btn btn-danger" disabled>
+                      </Link>
+                      <a
+                        href="#"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(destination.id)}
+                      >
                         Hapus
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))}
-              </>
-            )}
-            {destinationsData.map((destination, index) => (
-              <tr key={destination.id}>
-                <th scope="row">{index + 1}</th>
-                <td>{destination.name}</td>
-                <td>{destination.location}</td>
-                <td>{destination.description}</td>
-                <td>
-                  <img src={destination.image_url} alt={destination.name} width={100} />
-                </td>
-                <td className="d-flex gap-2">
-                  <Link
-                    to={`/admin/edit-destinasi/${destination.id}`}
-                    className="btn btn-warning text-dark"
-                  >
-                    Edit
-                  </Link>
-                  <a
-                    href="#"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(destination.id)}
-                  >
-                    Hapus
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
