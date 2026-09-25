@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { fetchAPI, APIError } from '../../services/api';
+import TableSkeleton from '../../layouts/components/TableSkeleton';
 
 const BookingData = () => {
   // const navigate = useNavigate();
@@ -69,29 +70,7 @@ const BookingData = () => {
             </tr>
           </thead>
           <tbody>
-            {isFetching && (
-              <>
-                {[...Array(3)].map((_, i) => (
-                  <tr key={`skeleton-${i}`}>
-                    <th scope="row">
-                      <span className="placeholder col-3 placeholder-wave"></span>
-                    </th>
-                    <td>
-                      <span className="placeholder col-8 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-10 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-9 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-9 placeholder-wave"></span>
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
+            {isFetching && <TableSkeleton columns={5} />}
             {bookingsData.map((booking, index) => (
               <tr key={booking.id}>
                 <th scope="row">{index + 1}</th>
