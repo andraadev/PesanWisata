@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useOutletContext, Link } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const EditUser = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isFetching, setIsFetching] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setPageTitle } = useOutletContext();
+
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-  const { setPageTitle } = useOutletContext();
 
   const [user, setUser] = useState({
     name: '',
@@ -22,37 +22,57 @@ const EditUser = () => {
     setPageTitle('Edit Data User');
   }, [setPageTitle]);
 
+  const { data: userData, isLoading } = useQuery({
+    queryKey: ['user', id],
+    queryFn: async ({ signal }) => {
+      const response = await fetchAPI(`/admin/users/${id}`, { signal });
+      return response.data;
+    },
+  });
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setIsFetching(true);
-        const response = await fetchAPI(`/admin/users/${id}`);
+    if (userData) {
+      setUser({
+        name: userData.name || '',
+        email: userData.email || '',
+        role: userData.role || '',
+        password: '',
+      });
+    }
+  }, [userData]);
 
-        if (response?.data) {
-          setUser({
-            name: response.data.name || '',
-            email: response.data.email || '',
-            role: response.data.role || '',
-            password: '',
-          });
+  const updateMutation = useMutation({
+    mutationFn: (payload) =>
+      fetchAPI(`/admin/users/${id}`, {
+        method: 'PUT',
+        body: payload,
+      }),
+
+    onSuccess: (data) => {
+      navigate('/admin/data-user', {
+        state: { message: data.message },
+      });
+    },
+
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else {
+          setError('Gagal mengubah data user. Silakan coba lagi nanti.');
         }
-      } catch (error) {
-        console.error('[Fetch User Error]:', error);
-        setError('Gagal mengambil data user. Silakan coba lagi nanti');
-      } finally {
-        setIsFetching(false);
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
       }
-    };
-
-    fetchUser();
-  }, [id]);
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
     setValidationErrors({});
@@ -67,33 +87,7 @@ const EditUser = () => {
       payload.password = user.password;
     }
 
-    try {
-      setIsSubmitting(true);
-      const data = await fetchAPI(`/admin/users/${id}`, {
-        method: 'PUT',
-        body: payload,
-      });
-
-      if (data) {
-        navigate('/admin/data-user', {
-          state: { message: data.message },
-        });
-      }
-    } catch (error) {
-      if (error instanceof APIError) {
-        if (error.status === 422) {
-          setValidationErrors(error.errors || {});
-        } else if (error.status === 401) {
-          setError('Sesi Anda telah berakhir. Silakan login kembali.');
-        } else {
-          setError('Gagal mengubah data user. Silakan coba lagi nanti.');
-        }
-      } else {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    updateMutation.mutate(payload);
   };
 
   return (
@@ -101,6 +95,7 @@ const EditUser = () => {
       <Link to="/admin/data-user" className="btn btn-secondary mb-3">
         Kembali ke Halaman Data User
       </Link>
+
       <div className="card p-4">
         {error && (
           <div className="alert alert-danger mt-3" role="alert">
@@ -108,7 +103,7 @@ const EditUser = () => {
           </div>
         )}
 
-        {isFetching ? (
+        {isLoading ? (
           <div className="placeholder-glow">
             <div className="row">
               <div className="col-sm-12 col-md-6 mb-3">
@@ -170,6 +165,7 @@ const EditUser = () => {
                   <div className="invalid-feedback">{validationErrors.name[0]}</div>
                 )}
               </div>
+
               <div id="input-group" className="col-sm-12 col-md-6 mb-3">
                 <label htmlFor="email" className="form-label">
                   Email
@@ -187,6 +183,7 @@ const EditUser = () => {
                 )}
               </div>
             </div>
+
             <div className="row">
               <div id="input-group" className="col-sm-12 col-md-6 mb-3">
                 <label htmlFor="password" className="form-label">
@@ -198,12 +195,14 @@ const EditUser = () => {
                   id="password"
                   placeholder="Kosongkan jika tidak ingin mengubah"
                   className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+                  value={user.password}
                   onChange={handleChange}
                 />
                 {validationErrors.password && (
                   <div className="invalid-feedback">{validationErrors.password[0]}</div>
                 )}
               </div>
+
               <div id="input-group" className="col-sm-12 col-md-6 mb-3">
                 <label className="form-label">Role</label>
                 <select
@@ -221,8 +220,9 @@ const EditUser = () => {
                 )}
               </div>
             </div>
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Memproses...' : 'Simpan'}
+
+            <button type="submit" className="btn btn-primary" disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? 'Memproses...' : 'Simpan'}
             </button>
           </form>
         )}

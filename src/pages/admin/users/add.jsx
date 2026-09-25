@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const TambahDataUser = () => {
@@ -13,7 +14,6 @@ const TambahDataUser = () => {
   const navigate = useNavigate();
   const [validationErrors, setValidationErrors] = useState({});
   const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { setPageTitle } = useOutletContext();
 
@@ -21,13 +21,40 @@ const TambahDataUser = () => {
     setPageTitle('Tambah Data User');
   }, [setPageTitle]);
 
+  const createUserMutation = useMutation({
+    mutationFn: (payload) =>
+      fetchAPI('/admin/users', {
+        method: 'POST',
+        body: payload,
+      }),
+    onSuccess: (data) => {
+      if (data.success) {
+        navigate('/admin/data-user', {
+          state: { message: data.message },
+        });
+      }
+    },
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else {
+          setError('Gagal menambahkan user. Silakan coba lagi nanti.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+
     setError(null);
     setValidationErrors({});
 
@@ -38,33 +65,7 @@ const TambahDataUser = () => {
       role: formData.role,
     };
 
-    try {
-      setIsSubmitting(true);
-      const data = await fetchAPI('/admin/users', {
-        method: 'POST',
-        body: payload,
-      });
-
-      if (data.success) {
-        navigate('/admin/data-user', {
-          state: { message: data.message },
-        });
-      }
-    } catch (error) {
-      if (error instanceof APIError) {
-        if (error.status === 422) {
-          setValidationErrors(error.errors || {});
-        } else if (error.status === 401) {
-          setError('Sesi Anda telah berakhir. Silakan login kembali.');
-        } else {
-          setError('Gagal menambahkan user. Silakan coba lagi nanti.');
-        }
-      } else {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    createUserMutation.mutate(payload);
   };
 
   return (
@@ -72,12 +73,14 @@ const TambahDataUser = () => {
       <Link to="/admin/data-user" className="btn btn-secondary mb-3">
         Kembali ke Halaman Data User
       </Link>
+
       <div className="card p-4">
         {error && (
           <div className="alert alert-danger mt-3" role="alert">
             {error}
           </div>
         )}
+
         <form onSubmit={handleSubmit}>
           <div className="row">
             <div id="input-group" className="col-sm-12 col-md-6 mb-3">
@@ -97,6 +100,7 @@ const TambahDataUser = () => {
                 <div className="invalid-feedback">{validationErrors.name[0]}</div>
               )}
             </div>
+
             <div id="input-group" className="col-sm-12 col-md-6 mb-3">
               <label htmlFor="email" className="form-label">
                 Email
@@ -114,6 +118,7 @@ const TambahDataUser = () => {
               )}
             </div>
           </div>
+
           <div className="row">
             <div id="input-group" className="col-sm-12 col-md-6 mb-3">
               <label htmlFor="password" className="form-label">
@@ -131,6 +136,7 @@ const TambahDataUser = () => {
                 <div className="invalid-feedback">{validationErrors.password[0]}</div>
               )}
             </div>
+
             <div id="input-group" className="col-sm-12 col-md-6 mb-3">
               <label className="form-label">Role</label>
               <select
@@ -148,8 +154,9 @@ const TambahDataUser = () => {
               )}
             </div>
           </div>
-          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Memproses...' : 'Tambah'}
+
+          <button type="submit" className="btn btn-primary" disabled={createUserMutation.isPending}>
+            {createUserMutation.isPending ? 'Memproses...' : 'Tambah'}
           </button>
         </form>
       </div>
