@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../services/api';
+import TableSkeleton from '../layouts/components/TableSkeleton';
+import Notification from '../layouts/components/Notification';
 
 const DataBooking = () => {
   const { setPageTitle, setPageSubtitle } = useOutletContext();
@@ -25,16 +27,6 @@ const DataBooking = () => {
     }
   }, [location, navigate]);
 
-  useEffect(() => {
-    if (!toastMessage) return;
-
-    const timer = setTimeout(() => {
-      setToastMessage(null);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [toastMessage]);
-
   const {
     data: bookingData = [],
     isLoading,
@@ -50,22 +42,9 @@ const DataBooking = () => {
   return (
     <div>
       {toastMessage && (
-        <div className="toast-container position-fixed top-0 end-0 p-3" style={{ zIndex: 11 }}>
-          <div
-            className="toast show align-items-center text-white bg-success border-0"
-            role="alert"
-          >
-            <div className="d-flex">
-              <div className="toast-body">{toastMessage}</div>
-              <button
-                type="button"
-                className="btn-close btn-close-white me-2 m-auto"
-                onClick={() => setToastMessage(null)}
-              ></button>
-            </div>
-          </div>
-        </div>
+        <Notification message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
+
       <div className="card p-4 table-responsive">
         <table className="table">
           <thead>
@@ -77,26 +56,7 @@ const DataBooking = () => {
             </tr>
           </thead>
           <tbody>
-            {isLoading && (
-              <>
-                {[...Array(5)].map((_, i) => (
-                  <tr key={`skeleton-${i}`}>
-                    <th scope="row">
-                      <span className="placeholder col-12 placeholder-wave"></span>
-                    </th>
-                    <td>
-                      <span className="placeholder col-8 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-10 placeholder-wave"></span>
-                    </td>
-                    <td>
-                      <span className="placeholder col-9 placeholder-wave"></span>
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
+            {isLoading && <TableSkeleton columns={4} />}
 
             {!isLoading && isError && (
               <tr>
