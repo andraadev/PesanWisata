@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../services/api';
 
 const DataBooking = () => {
-  const [bookingData, setBookingData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { setPageTitle, setPageSubtitle } = useOutletContext();
 
   const navigate = useNavigate();
@@ -37,28 +35,18 @@ const DataBooking = () => {
     return () => clearTimeout(timer);
   }, [toastMessage]);
 
-  useEffect(() => {
-    const fetchBooking = async () => {
-      try {
-        const res = await fetchAPI('/booking');
-
-        if (Array.isArray(res?.data) && res.data.length > 0) {
-          setBookingData(res.data);
-        } else {
-          setError('Belum ada data reservasi. Mulai pesan sekarang!');
-        }
-      } catch (error) {
-        if (error instanceof APIError) {
-          setError(error.message);
-        } else {
-          setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBooking();
-  }, []);
+  const {
+    data: bookingData = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['booking'],
+    queryFn: async ({ signal }) => {
+      const res = await fetchAPI('/booking', { signal });
+      return res.data;
+    },
+  });
   return (
     <div>
       {toastMessage && (
@@ -89,14 +77,7 @@ const DataBooking = () => {
             </tr>
           </thead>
           <tbody>
-            {/* {loading && (
-              <tr>
-                <td colSpan="4" className="text-center py-4">
-                  Sedang mengambil data reservasi dari server...
-                </td>
-              </tr>
-            )} */}
-            {loading && (
+            {isLoading && (
               <>
                 {[...Array(5)].map((_, i) => (
                   <tr key={`skeleton-${i}`}>
@@ -117,22 +98,24 @@ const DataBooking = () => {
               </>
             )}
 
-            {error && (
+            {!isLoading && isError && (
               <tr>
                 <td colSpan="4" className="text-center py-4">
-                  {error}
+                  {error?.message || 'Tidak dapat terhubung ke server. Silakan coba lagi nanti.'}
                 </td>
               </tr>
             )}
 
-            {bookingData.map((booking, no) => (
-              <tr key={booking.id}>
-                <th scope="row">{no + 1}</th>
-                <td>{booking.name}</td>
-                <td>{booking.destination}</td>
-                <td>{booking.booking_date}</td>
-              </tr>
-            ))}
+            {!isLoading &&
+              !isError &&
+              bookingData.map((booking, no) => (
+                <tr key={booking.id}>
+                  <th scope="row">{no + 1}</th>
+                  <td>{booking.user?.name || '-'}</td>
+                  <td>{booking.destination?.name || '-'}</td>
+                  <td>{booking.booking_date}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
