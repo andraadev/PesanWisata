@@ -52,12 +52,6 @@ const BookingData = () => {
 
   return (
     <div>
-      {error && (
-        <div className="alert alert-danger mt-5" role="alert">
-          {error}
-        </div>
-      )}
-
       <div className="card p-4 table-responsive">
         <table className="table table-bordered">
           <thead>
@@ -71,15 +65,25 @@ const BookingData = () => {
           </thead>
           <tbody>
             {isFetching && <TableSkeleton columns={5} />}
-            {bookingsData.map((booking, index) => (
-              <tr key={booking.id}>
-                <th scope="row">{index + 1}</th>
-                <td>{booking.name}</td>
-                <td>{booking.destination}</td>
-                <td>{booking.booking_date}</td>
-                <td>{booking.status}</td>
+            {!isFetching && error && (
+              <tr>
+                <td colSpan="5" className="text-center py-4 text-danger">
+                  {error}
+                </td>
               </tr>
-            ))}
+            )}
+
+            {!isFetching &&
+              !error &&
+              bookingsData.map((booking, index) => (
+                <tr key={booking.id}>
+                  <th scope="row">{index + 1}</th>
+                  <td>{booking.name}</td>
+                  <td>{booking.destination}</td>
+                  <td>{booking.booking_date}</td>
+                  <td>{booking.status}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
