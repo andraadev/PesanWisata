@@ -26,10 +26,6 @@ const BookingData = () => {
         if (Array.isArray(result?.data)) {
           setBookingsData(result.data);
         } else {
-          console.error(
-            '[Fetch Bookings Error]: Expecting array in response.data, got:',
-            result?.data
-          );
           setError('Gagal menampilkan data reservasi. Silakan segarkan (refresh) halaman.');
         }
       } catch (error) {
