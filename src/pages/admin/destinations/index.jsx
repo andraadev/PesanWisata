@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 import Notification from '../../../layouts/components/Notification';
 import TableSkeleton from '../../../layouts/components/TableSkeleton';
@@ -7,9 +8,7 @@ import TableSkeleton from '../../../layouts/components/TableSkeleton';
 const DataDestinasi = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [destinationsData, setDestinationsData] = useState([]);
-  const [isFetching, setIsFetching] = useState(true);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
   const [toastMessage, setToastMessage] = useState(null);
 
   const { setPageTitle, setPageSubtitle } = useOutletContext();
@@ -27,58 +26,33 @@ const DataDestinasi = () => {
     }
   }, [location, navigate]);
 
-  useEffect(() => {
-    const fetchDestinations = async () => {
-      try {
-        setIsFetching(true);
-        const result = await fetchAPI('/admin/destinations');
+  const {
+    data: destinationsData = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['destinations'],
+    queryFn: async ({ signal }) => {
+      const result = await fetchAPI('/admin/destinations', { signal });
+      return result.data;
+    },
+  });
 
-        if (Array.isArray(result?.data)) {
-          setDestinationsData(result.data);
-        } else {
-          setError('Gagal menampilkan data destinasi. Silakan segarkan (refresh) halaman.');
-        }
-      } catch (error) {
-        if (error instanceof APIError) {
-          if (error.status === 401) {
-            setError('Sesi telah berakhir, silakan login kembali.');
-          } else {
-            setError('Gagal memuat data destinasi. Silakan coba lagi nanti.');
-          }
-        } else {
-          setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-        }
-      } finally {
-        setIsFetching(false);
-      }
-    };
-
-    fetchDestinations();
-  }, []);
+  const deleteMutation = useMutation({
+    mutationFn: (id) => fetchAPI(`/admin/destinations/${id}`, { method: 'DELETE' }),
+    onSuccess: (data) => {
+      setToastMessage(data?.message || 'Data berhasil dihapus');
+      queryClient.invalidateQueries({ queryKey: ['destinations'] });
+    },
+    onError: () => {
+      alert('Gagal menghapus data. Silakan coba beberapa saat lagi.');
+    },
+  });
 
   async function handleDelete(id) {
     if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
-      try {
-        const data = await fetchAPI(`/admin/destinations/${id}`, {
-          method: 'DELETE',
-        });
-
-        setToastMessage(data.message || 'Data berhasil dihapus');
-        setDestinationsData((prevDestinations) =>
-          prevDestinations.filter((destination) => destination.id !== id)
-        );
-      } catch (error) {
-        if (error instanceof APIError) {
-          if (error.status === 401) {
-            alert('Sesi Anda telah berakhir. Silakan login kembali.');
-            navigate('/login');
-          } else {
-            alert('Gagal menghapus data. Silakan coba beberapa saat lagi.');
-          }
-        } else {
-          alert('Tidak dapat terhubung ke server.');
-        }
-      }
+      deleteMutation.mutate(id);
     }
   }
 
@@ -107,17 +81,17 @@ const DataDestinasi = () => {
               </tr>
             </thead>
             <tbody>
-              {isFetching && <TableSkeleton columns={6} />}
+              {isLoading && <TableSkeleton columns={6} />}
 
-              {!isFetching && error && (
+              {!isLoading && isError && (
                 <tr>
-                  <td colSpan="5" className="text-center py-4 text-danger">
-                    {error}
+                  <td colSpan="6" className="text-center py-4 text-danger">
+                    {error?.message || 'Gagal memuat data destinasi. Silakan coba lagi nanti.'}
                   </td>
                 </tr>
               )}
-              {!isFetching &&
-                !error &&
+              {!isLoading &&
+                !isError &&
                 destinationsData.map((destination, index) => (
                   <tr key={destination.id}>
                     <th scope="row">{index + 1}</th>
@@ -134,13 +108,14 @@ const DataDestinasi = () => {
                       >
                         Edit
                       </Link>
-                      <a
-                        href="#"
+                      <button
+                        type="button"
                         className="btn btn-danger"
                         onClick={() => handleDelete(destination.id)}
+                        disabled={deleteMutation.isPending}
                       >
-                        Hapus
-                      </a>
+                        {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                      </button>
                     </td>
                   </tr>
                 ))}

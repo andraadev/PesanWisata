@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const TambahDestinasi = () => {
@@ -14,12 +15,39 @@ const TambahDestinasi = () => {
   const { setPageTitle } = useOutletContext();
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     setPageTitle('Tambah Data Destinasi');
   }, [setPageTitle]);
+
+  const createDestinationMutation = useMutation({
+    mutationFn: (payload) =>
+      fetchAPI('/admin/destinations', {
+        method: 'POST',
+        body: payload,
+      }),
+    onSuccess: (data) => {
+      if (data?.success) {
+        navigate('/admin/data-destinasi', {
+          state: { message: data.message },
+        });
+      }
+    },
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else if (error.status === 401) {
+          setError('Sesi Anda telah berakhir. Silakan login kembali.');
+        } else {
+          setError('Gagal menambahkan destinasi. Silakan coba lagi nanti.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
 
   // const handleChange = (e) => {
   //   const { name, type, value, files } = e.target;
@@ -60,33 +88,7 @@ const TambahDestinasi = () => {
       }
     });
 
-    try {
-      setIsSubmitting(true);
-
-      const data = await fetchAPI('/admin/destinations', {
-        method: 'POST',
-        body: formDataSubmit,
-      });
-
-      if (data.success) {
-        navigate('/admin/data-destinasi', {
-          state: { message: data.message },
-        });
-      }
-    } catch (error) {
-      setIsSubmitting(false);
-      if (error instanceof APIError) {
-        if (error.status === 422) {
-          setValidationErrors(error.errors || {});
-        } else if (error.status === 401) {
-          setError('Sesi Anda telah berakhir. Silakan login kembali.');
-        } else {
-          setError('Gagal menambahkan destinasi. Silakan coba lagi nanti.');
-        }
-      } else {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-      }
-    }
+    createDestinationMutation.mutate(formDataSubmit);
   };
   return (
     <div>
@@ -180,8 +182,12 @@ const TambahDestinasi = () => {
               </div>
             )}
           </div>
-          <button type="submit" className="btn btn-primary mb-3" disabled={isSubmitting}>
-            {isSubmitting ? 'Memproses...' : 'Tambah'}
+          <button
+            type="submit"
+            className="btn btn-primary mb-3"
+            disabled={createDestinationMutation.isPending}
+          >
+            {createDestinationMutation.isPending ? 'Memproses...' : 'Tambah'}
           </button>
         </form>
       </div>

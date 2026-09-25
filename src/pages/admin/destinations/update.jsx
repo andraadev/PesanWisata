@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const EditDataDestinasi = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isFetching, setIsFetching] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
@@ -25,29 +25,53 @@ const EditDataDestinasi = () => {
     setPageTitle('Edit Data Destinasi');
   }, [setPageTitle]);
 
-  useEffect(() => {
-    const fetchDestination = async () => {
-      try {
-        setIsFetching(true);
-        const response = await fetchAPI(`/admin/destinations/${id}`);
-        if (response?.data) {
-          setFormData({
-            name: response.data.name || '',
-            location: response.data.location || '',
-            description: response.data.description || '',
-            image_url: null,
-          });
-          setOldImage(response.data.image_url || null);
-        }
-      } catch (error) {
-        setError('Gagal mengambil data destinasi. Silakan coba lagi nanti');
-      } finally {
-        setIsFetching(false);
-      }
-    };
+  const { data: destinationData, isLoading: isFetching } = useQuery({
+    queryKey: ['destination', id],
+    queryFn: async ({ signal }) => {
+      const response = await fetchAPI(`/admin/destinations/${id}`, { signal });
+      return response.data;
+    },
+    enabled: !!id,
+  });
 
-    fetchDestination();
-  }, [id]);
+  useEffect(() => {
+    if (destinationData) {
+      setFormData({
+        name: destinationData.name || '',
+        location: destinationData.location || '',
+        description: destinationData.description || '',
+        image_url: null,
+      });
+      setOldImage(destinationData.image_url || null);
+      setImagePreview(null);
+    }
+  }, [destinationData]);
+
+  const updateDestinationMutation = useMutation({
+    mutationFn: (payload) =>
+      fetchAPI(`/admin/destinations/${id}`, {
+        method: 'POST',
+        body: payload,
+      }),
+    onSuccess: (data) => {
+      navigate('/admin/data-destinasi', {
+        state: { message: data.message },
+      });
+    },
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else if (error.status === 401) {
+          setError('Sesi Anda telah berakhir. Silakan login kembali.');
+        } else {
+          setError('Gagal mengubah data destinasi. Silakan coba lagi nanti.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
 
   const handleChange = (e) => {
     const { name, type, value, files } = e.target;
@@ -69,7 +93,6 @@ const EditDataDestinasi = () => {
     e.preventDefault();
     setError(null);
     setValidationErrors({});
-    console.log('Submitted data:', formData);
 
     const formDataSubmit = new FormData();
     formDataSubmit.append('_method', 'PUT');
@@ -81,32 +104,7 @@ const EditDataDestinasi = () => {
       formDataSubmit.append('image_url', formData.image_url);
     }
 
-    try {
-      setIsSubmitting(true);
-      const data = await fetchAPI(`/admin/destinations/${id}`, {
-        method: 'POST',
-        body: formDataSubmit,
-      });
-
-      if (data) {
-        navigate('/admin/data-destinasi', {
-          state: { message: data.message },
-        });
-      }
-    } catch (error) {
-      setIsSubmitting(false);
-      if (error instanceof APIError) {
-        if (error.status === 422) {
-          setValidationErrors(error.errors || {});
-        } else if (error.status === 401) {
-          setError('Sesi Anda telah berakhir. Silakan login kembali.');
-        } else {
-          setError('Gagal mengubah data user. Silakan coba lagi nanti.');
-        }
-      } else {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-      }
-    }
+    updateDestinationMutation.mutate(formDataSubmit);
   };
 
   return (
@@ -225,8 +223,12 @@ const EditDataDestinasi = () => {
               )}
             </div>
 
-            <button type="submit" className="btn btn-primary mb-3" disabled={isSubmitting}>
-              {isSubmitting ? 'Memproses...' : 'Simpan'}
+            <button
+              type="submit"
+              className="btn btn-primary mb-3"
+              disabled={updateDestinationMutation.isPending}
+            >
+              {updateDestinationMutation.isPending ? 'Memproses...' : 'Simpan'}
             </button>
           </form>
         )}
