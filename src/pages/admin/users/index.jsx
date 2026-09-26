@@ -25,6 +25,7 @@ const DataUser = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['users'],
     queryFn: async ({ signal }) => {
@@ -85,7 +86,15 @@ const DataUser = () => {
               {!isLoading && isError && (
                 <tr>
                   <td colSpan="5" className="text-center py-4 text-danger">
-                    Gagal memuat data user. Silakan coba lagi nanti.
+                    <p className="mb-2">Gagal memuat data user. Silakan coba lagi nanti.</p>
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => refetch()}
+                    >
+                      Coba Lagi
+                    </button>
                   </td>
                 </tr>
               )}
