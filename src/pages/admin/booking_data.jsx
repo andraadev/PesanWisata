@@ -41,10 +41,11 @@ const BookingData = () => {
           </thead>
           <tbody>
             {isLoading && <TableSkeleton columns={5} />}
+
             {!isLoading && isError && (
               <tr>
                 <td colSpan="5" className="text-center py-4 text-danger">
-                  {error?.message || 'Gagal memuat data reservasi. Silakan coba lagi nanti.'}
+                  Gagal memuat data reservasi. Silakan coba lagi nanti.
                 </td>
               </tr>
             )}

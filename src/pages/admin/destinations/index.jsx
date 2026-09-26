@@ -50,7 +50,7 @@ const DataDestinasi = () => {
     },
   });
 
-  async function handleDelete(id) {
+  function handleDelete(id) {
     if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
       deleteMutation.mutate(id);
     }
@@ -85,11 +85,12 @@ const DataDestinasi = () => {
 
               {!isLoading && isError && (
                 <tr>
-                  <td colSpan="6" className="text-center py-4 text-danger">
-                    {error?.message || 'Gagal memuat data destinasi. Silakan coba lagi nanti.'}
+                  <td colSpan="5" className="text-center py-4 text-danger">
+                    Gagal memuat data destinasi. Silakan coba lagi nanti.
                   </td>
                 </tr>
               )}
+
               {!isLoading &&
                 !isError &&
                 destinationsData.map((destination, index) => (

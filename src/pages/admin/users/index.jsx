@@ -85,7 +85,7 @@ const DataUser = () => {
               {!isLoading && isError && (
                 <tr>
                   <td colSpan="5" className="text-center py-4 text-danger">
-                    {error?.message || 'Gagal memuat data user. Silakan coba lagi nanti.'}
+                    Gagal memuat data user. Silakan coba lagi nanti.
                   </td>
                 </tr>
               )}
