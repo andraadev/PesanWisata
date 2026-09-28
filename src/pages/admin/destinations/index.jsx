@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 import Notification from '../../../layouts/components/Notification';
 import TableSkeleton from '../../../layouts/components/TableSkeleton';
+import TableError from '../../../layouts/components/TableError';
 
 const DataDestinasi = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const DataDestinasi = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['destinations'],
     queryFn: async ({ signal }) => {
@@ -83,13 +85,7 @@ const DataDestinasi = () => {
             <tbody>
               {isLoading && <TableSkeleton columns={6} />}
 
-              {!isLoading && isError && (
-                <tr>
-                  <td colSpan="5" className="text-center py-4 text-danger">
-                    Gagal memuat data destinasi. Silakan coba lagi nanti.
-                  </td>
-                </tr>
-              )}
+              {!isLoading && isError && <TableError colSpan={6} onRetry={refetch} />}
 
               {!isLoading &&
                 !isError &&
