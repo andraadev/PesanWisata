@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../services/api';
 import TableSkeleton from '../layouts/components/TableSkeleton';
 import Notification from '../layouts/components/Notification';
+import TableError from '../layouts/components/TableError';
 
 const DataBooking = () => {
   const { setPageTitle, setPageSubtitle } = useOutletContext();
@@ -32,6 +33,7 @@ const DataBooking = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['booking'],
     queryFn: async ({ signal }) => {
@@ -58,13 +60,7 @@ const DataBooking = () => {
           <tbody>
             {isLoading && <TableSkeleton columns={4} />}
 
-            {!isLoading && isError && (
-              <tr>
-                <td colSpan="4" className="text-center py-4">
-                  {error?.message || 'Tidak dapat terhubung ke server. Silakan coba lagi nanti.'}
-                </td>
-              </tr>
-            )}
+            {!isLoading && isError && <TableError colSpan={4} onRetry={refetch} />}
 
             {!isLoading &&
               !isError &&
