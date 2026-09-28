@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../services/api';
 
 const DestinasiWisata = () => {
-  const [destinasiData, setDestinasiData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   const { setPageTitle, setPageSubtitle } = useOutletContext();
 
   useEffect(() => {
@@ -14,31 +11,21 @@ const DestinasiWisata = () => {
     setPageSubtitle('Silakan pilih destinasi yang kamu ingin kunjungi.');
   }, [setPageTitle, setPageSubtitle]);
 
-  useEffect(() => {
-    const fetchDestinasi = async () => {
-      try {
-        const res = await fetchAPI('/destinations');
+  const {
+    data: destinasiData = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['destinasi'],
+    queryFn: async ({ signal }) => {
+      const res = await fetchAPI('/destinations', { signal });
+      return res.data;
+    },
+  });
 
-        if (Array.isArray(res?.data) && res.data.length > 0) {
-          setDestinasiData(res.data);
-        } else {
-          setError('Data destinasi belum tersedia. Silakan coba lagi nanti.');
-        }
-      } catch (err) {
-        if (err instanceof APIError) {
-          setError(err.message);
-        } else {
-          setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDestinasi();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div>
         <section className="destination-cards-wrapper container-fluid row grid gap-5">
@@ -75,8 +62,15 @@ const DestinasiWisata = () => {
     );
   }
 
-  if (error) {
-    return <div className="alert alert-info">{error}</div>;
+  if (isError) {
+    return (
+      <div className="text-center">
+        <div className="alert alert-info mb-2">Gagal memuat data. Silakan coba lagi nanti.</div>;
+        <button type="button" className="btn btn-primary" onClick={refetch}>
+          Coba Lagi
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -95,7 +89,7 @@ const DestinasiWisata = () => {
               <div className="card-body">
                 <h5 className="card-title">
                   {destinasi.name}
-                  <span className="badge text-bg-primary">{destinasi.location}</span>
+                  <span className="badge text-bg-primary ms-2">{destinasi.location}</span>
                 </h5>
                 <p className="card-text description">{destinasi.description}</p>
                 <Link to={`/booking/${destinasi.slug}`} className="btn btn-primary w-100">
