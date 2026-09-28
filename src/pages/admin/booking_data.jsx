@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../services/api';
 import TableSkeleton from '../../layouts/components/TableSkeleton';
+import TableError from '../../layouts/components/TableError';
 
 const BookingData = () => {
   const [toastMessage, setToastMessage] = useState(null);
@@ -18,6 +19,7 @@ const BookingData = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['admin-bookings'],
     queryFn: async ({ signal }) => {
@@ -42,13 +44,7 @@ const BookingData = () => {
           <tbody>
             {isLoading && <TableSkeleton columns={5} />}
 
-            {!isLoading && isError && (
-              <tr>
-                <td colSpan="5" className="text-center py-4 text-danger">
-                  Gagal memuat data reservasi. Silakan coba lagi nanti.
-                </td>
-              </tr>
-            )}
+            {!isLoading && isError && <TableError colSpan={6} onRetry={refetch} />}
 
             {!isLoading &&
               !isError &&
