@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchAPI } from '../../../services/api';
 import Notification from '../../../layouts/components/Notification';
 import TableSkeleton from '../../../layouts/components/TableSkeleton';
+import TableError from '../../../layouts/components/TableError';
 
 const DataUser = () => {
   const navigate = useNavigate();
@@ -83,21 +84,7 @@ const DataUser = () => {
             <tbody>
               {isLoading && <TableSkeleton columns={5} />}
 
-              {!isLoading && isError && (
-                <tr>
-                  <td colSpan="5" className="text-center py-4 text-danger">
-                    <p className="mb-2">Gagal memuat data user. Silakan coba lagi nanti.</p>
-
-                    <button
-                      type="button"
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => refetch()}
-                    >
-                      Coba Lagi
-                    </button>
-                  </td>
-                </tr>
-              )}
+              {!isLoading && isError && <TableError colSpan={5} onRetry={refetch} />}
 
               {!isLoading &&
                 !isError &&
