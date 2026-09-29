@@ -66,7 +66,7 @@ const Navbar = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/destinasi" className="nav-link text-dark">
+                  <NavLink to="/destinations" className="nav-link text-dark">
                     Destinasi Wisata
                   </NavLink>
                 </li>
@@ -76,22 +76,22 @@ const Navbar = () => {
             {isAuthenticated && role === 'Admin' && (
               <>
                 <li className="nav-item">
-                  <NavLink className="nav-link text-dark" aria-current="page" to="/admin/beranda">
+                  <NavLink className="nav-link text-dark" aria-current="page" to="/admin/dashboard">
                     Beranda
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link text-dark" to="/admin/data-user">
+                  <NavLink className="nav-link text-dark" to="/admin/users">
                     Data User
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link text-dark" to="/admin/data-destinasi">
+                  <NavLink className="nav-link text-dark" to="/admin/destinations">
                     Data Destinasi
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link text-dark" to="/admin/data-reservasi">
+                  <NavLink className="nav-link text-dark" to="/admin/bookings">
                     Data Reservasi
                   </NavLink>
                 </li>
@@ -100,7 +100,7 @@ const Navbar = () => {
 
             {isAuthenticated && role === 'User' && (
               <li className="nav-item">
-                <NavLink to="/data-booking" className="nav-link text-dark">
+                <NavLink to="/user/bookings" className="nav-link text-dark">
                   Reservasi Saya
                 </NavLink>
               </li>
