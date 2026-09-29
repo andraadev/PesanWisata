@@ -3,7 +3,7 @@ import { useOutletContext, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../services/api';
 
-const DestinasiWisata = () => {
+const Destinations = () => {
   const { setPageTitle, setPageSubtitle } = useOutletContext();
 
   useEffect(() => {
@@ -92,7 +92,7 @@ const DestinasiWisata = () => {
                   <span className="badge text-bg-primary ms-2">{destinasi.location}</span>
                 </h5>
                 <p className="card-text description">{destinasi.description}</p>
-                <Link to={`/booking/${destinasi.slug}`} className="btn btn-primary w-100">
+                <Link to={`/user/booking/${destinasi.slug}`} className="btn btn-primary w-100">
                   Pilih
                 </Link>
               </div>
@@ -104,4 +104,4 @@ const DestinasiWisata = () => {
   );
 };
 
-export default DestinasiWisata;
+export default Destinations;
