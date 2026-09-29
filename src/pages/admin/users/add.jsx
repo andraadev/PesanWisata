@@ -1,116 +1,167 @@
-import React, { useState } from "react";
-import NavbarAdmin from "../../../components/navbar_admin";
-import Footer from "../../../components/footer";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useOutletContext, Link, useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { fetchAPI, APIError } from '../../../services/api';
 
-const TambahDataUser = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirm_password: '',
-        role: '',
-    });
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+const CreateUser = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: '',
+  });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  const navigate = useNavigate();
+  const [validationErrors, setValidationErrors] = useState({});
+  const [error, setError] = useState(null);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        console.log(formData);
+  const { setPageTitle } = useOutletContext();
 
-        const formDataSubmit = new FormData();
-        Object.keys(formData).forEach(key => {
-            formDataSubmit.append(key, formData[key]);
+  useEffect(() => {
+    setPageTitle('Tambah Data User');
+  }, [setPageTitle]);
+
+  const createUserMutation = useMutation({
+    mutationFn: (payload) =>
+      fetchAPI('/admin/users', {
+        method: 'POST',
+        body: payload,
+      }),
+    onSuccess: (data) => {
+      if (data.success) {
+        navigate('/admin/users', {
+          state: { message: data.message },
         });
-
-        try {
-            // const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/api/admin/users', {
-                method: "POST",
-                // headers: {
-                //     'Authorization': `Bearer ${token}`
-                // },
-                body: formDataSubmit,
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Tampilkan alert sukses
-                alert('User Baru berhasil ditambahkan');
-                // Redirect ke halaman data user
-                navigate('/data-user');
-            } else if (response.status === 422) {
-                setError(data);
-            } else {
-                setError(data.message || 'User Baru Gagal Ditambahkan');
-            }
-        } catch (error) {
-            setError(error.message);
+      }
+    },
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else {
+          setError('Gagal menambahkan user. Silakan coba lagi nanti.');
         }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    setError(null);
+    setValidationErrors({});
+
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role,
     };
 
-    return (
-        <div>
-            <NavbarAdmin />
-            <main className="container content-wrapper">
-                <a href="/data-user" className="btn btn-secondary">Kembali ke Halaman Data User</a>
-                <h1 className="text-shadow">Tambah Data User</h1>
-                <p className="text-shadow">Di halaman ini, kamu dapat mendaftarkan user baru.</p>
-                <div className="card p-4">
-                    {/* Alert Bootstrap untuk menampilkan semua error validasi */}
-                    {error && (
-                        <div className="alert alert-danger" role="alert">
-                            <ul>
-                                {/* Menampilkan error dari API di dalam list */}
-                                {Object.keys(error).map((key) => (
-                                    <li key={key}>{error[key][0]}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                    <form onSubmit={handleSubmit}>
-                        <div className="row">
-                            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="nama_lengkap" className="form-label">Nama</label>
-                                <input type="text" name="name" id="nama_lengkap" className="form-control" value={formData.name} onChange={handleChange} autoFocus />
-                            </div>
-                            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="email" className="form-label">Email</label>
-                                <input type="email" name="email" id="email" className="form-control" value={formData.email} onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="password" className="form-label">Kata Sandi</label>
-                                <input type="password" name="password" id="password" className="form-control" value={formData.password} onChange={handleChange} />
-                            </div>
-                            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="confirm_password" className="form-label">Konfirmasi Kata Sandi</label>
-                                <input type="password" name="confirm_password" id="confirm_password" className="form-control" value={formData.confirm_password} onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Role</label>
-                            <select name="role" className="form-select" value={formData.role} onChange={handleChange}>
-                                <option value="">Pilih Role</option>
-                                <option value="Admin">Admin</option>
-                                <option value="User">User</option>
-                            </select>
-                        </div>
-                        <button type="submit" className="btn btn-primary mb-3">Tambah</button>
-                    </form>
-                </div>
-            </main>
-            <Footer />
-        </div>
-    );
+    createUserMutation.mutate(payload);
+  };
+
+  return (
+    <div>
+      <Link to="/admin/users" className="btn btn-secondary mb-3">
+        Kembali ke Halaman Data User
+      </Link>
+
+      <div className="card p-4">
+        {error && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="row">
+            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+              <label htmlFor="nama_lengkap" className="form-label">
+                Nama
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="nama_lengkap"
+                className={`form-control ${validationErrors.name ? 'is-invalid' : ''}`}
+                value={formData.name}
+                onChange={handleChange}
+                autoFocus
+              />
+              {validationErrors.name && (
+                <div className="invalid-feedback">{validationErrors.name[0]}</div>
+              )}
+            </div>
+
+            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {validationErrors.email && (
+                <div className="invalid-feedback">{validationErrors.email[0]}</div>
+              )}
+            </div>
+          </div>
+
+          <div className="row">
+            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+                value={formData.password}
+                onChange={handleChange}
+              />
+              {validationErrors.password && (
+                <div className="invalid-feedback">{validationErrors.password[0]}</div>
+              )}
+            </div>
+
+            <div id="input-group" className="col-sm-12 col-md-6 mb-3">
+              <label className="form-label">Role</label>
+              <select
+                name="role"
+                className={`form-select ${validationErrors.role ? 'is-invalid' : ''}`}
+                value={formData.role}
+                onChange={handleChange}
+              >
+                <option value="">Pilih Role</option>
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+              </select>
+              {validationErrors.role && (
+                <div className="invalid-feedback">{validationErrors.role[0]}</div>
+              )}
+            </div>
+          </div>
+
+          <button type="submit" className="btn btn-primary" disabled={createUserMutation.isPending}>
+            {createUserMutation.isPending ? 'Memproses...' : 'Tambah'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
-export default TambahDataUser;
+export default CreateUser;

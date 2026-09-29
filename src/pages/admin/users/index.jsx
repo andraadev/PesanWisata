@@ -1,110 +1,129 @@
-import React, {useState, useEffect} from "react";
-import { Link } from "react-router-dom";
-import NavbarAdmin from "../../../components/navbar_admin";
-import Footer from "../../../components/footer";
+import React, { useState, useEffect } from 'react';
+import { useOutletContext, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchAPI } from '../../../services/api';
+import Notification from '../../../layouts/components/Notification';
+import TableSkeleton from '../../../layouts/components/TableSkeleton';
+import TableError from '../../../layouts/components/TableError';
 
-const DataUser = () => {
-const [usersData, setUsersData] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
+const Users = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const { setPageTitle, setPageSubtitle } = useOutletContext();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-    //   const token = localStorage.getItem('token');
-      try {
-        const response = await fetch("http://localhost:8000/api/admin/users", {
-        //   headers: {
-        //     'Authorization': `Bearer ${token}`
-        //   }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error ! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        // Cek log data
-        if (Array.isArray(data.data)) {
-            setUsersData(data.data);
-        } else {
-          setError("Data tidak valid atau tidak tersedia");
-        }
-      } catch (error) {
-        setError("Terjadi kesalahan saat mengambil data: " + error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setPageTitle('Data User');
+    setPageSubtitle(
+      'Di halaman ini, kamu dapat melihat siapa saja yang sudah terdaftar di aplikasi ini.'
+    );
+  }, [setPageTitle, setPageSubtitle]);
 
-    fetchUsers();
-  }, []);
-  if(loading) 
-  return (<p className="text-center mt-5">Sedang mengambil data user...</p>)
-  if(error)
-    return (
-    <div className="alert alert-danger mt-5" role="alert">
-    Error = {error}
-    </div>
-)
-return(
-<div>
-    <NavbarAdmin/>
-    <main className="container content-wrapper">
-        <h1 className="text-shadow">Data User</h1>
-        <p className="text-shadow">Di halaman ini, kamu dapat melihat siapa saja yang sudah terdaftar di aplikasi ini.</p>
-        <div className="card p-4 table-responsive">
-            <Link to="/tambah-user" className="btn btn-primary mb-3">Tambah</Link>
-            <table className="table table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">No</th>
-                        <th scope="col">Nama Lengkap</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Role</th>
-                        <th scope="col">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {usersData.map((user, index) => (
-                    <tr key={user.id}>
-                    <th scope="row">{index+1}</th>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role}</td>
-                    <td>
-                        <Link to={`/edit-user/${user.id}`} className="btn btn-warning text-dark">Edit</Link>
-                        <a href="#" className="btn btn-danger" onClick={() => handleDelete(user.id)}>Hapus</a>
-                    </td>
-                </tr>
-                ))}
+  const {
+    data: usersData = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['users'],
+    queryFn: async ({ signal }) => {
+      const res = await fetchAPI('/admin/users', { signal });
+      return res.data;
+    },
+  });
 
-                </tbody>
-            </table>
-        </div>
-    </main>
-<Footer/>
-</div>
-);
-// Fungsi untuk menangani penghapusan
-async function handleDelete(id) {
-    if (window.confirm('Apakah anda yakin? Tindakan ini mungkin memengaruhi data user ini di tabel lain.')) {
-    //   const token = localStorage.getItem('token');
-      try {
-        const response = await fetch(`http://localhost:8000/api/admin/users/${id}`, {
-          method: 'DELETE',
-        //   headers: {
-        //     'Authorization': `Bearer ${token}`
-        //   }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error ! Status: ${response.status}`);
-        }
-        // Update state setelah penghapusan
-        setUsersData(usersData.filter(user => user.id !== id));
-      } catch (error) {
-        alert("Terjadi kesalahan saat menghapus data: " + error.message);
-      }
+  const deleteMutation = useMutation({
+    mutationFn: (id) => fetchAPI(`/admin/users/${id}`, { method: 'DELETE' }),
+    onSuccess: (data) => {
+      setToastMessage(data?.message || 'Data berhasil dihapus');
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+    onError: (err) => {
+      alert('Gagal menghapus data. Silakan coba beberapa saat lagi.');
+    },
+  });
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setToastMessage(location.state.message);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
+
+  function handleDelete(id) {
+    if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
+      deleteMutation.mutate(id);
     }
   }
-}
 
+  return (
+    <div>
+      {toastMessage && (
+        <Notification message={toastMessage} onClose={() => setToastMessage(null)} />
+      )}
+      <div className="card">
+        <div className="card-header">
+          <Link to="/admin/users/create" className="btn btn-primary">
+            Tambah
+          </Link>
+        </div>
+        <div className="card-body table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama Lengkap</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading && <TableSkeleton columns={5} />}
 
-export default DataUser;
+              {!isLoading && isError && <TableError colSpan={5} onRetry={refetch} />}
+
+              {!isLoading &&
+                !isError &&
+                usersData.map((user, index) => (
+                  <tr key={user.id}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span
+                        className={`badge text-bg-${user.role === 'Admin' ? 'primary' : 'secondary'}`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="d-flex gap-2">
+                      <Link
+                        to={`/admin/users/${user.id}/edit`}
+                        className="btn btn-warning text-dark"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        disabled={deleteMutation.isPending}
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Users;

@@ -1,138 +1,240 @@
-import React, { useState, useEffect } from "react";
-import NavbarAdmin from "../../../components/navbar_admin";
-import Footer from "../../../components/footer";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { fetchAPI, APIError } from '../../../services/api';
 
-const EditDataDestinasi = () => {
-    const { id } = useParams(); // Mendapatkan ID destinasi dari URL
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        name: '',
-        slug: '',
-        location: '',
-        description: '',
-    });
+const EditDestination = () => {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const { setPageTitle } = useOutletContext();
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    location: '',
+    description: '',
+    image_url: null,
+  });
 
-    useEffect(() => {
-        const fetchDestination = async () => {
-            try {
-                const response = await fetch(`http://localhost:8000/api/admin/destinations/${id}`);
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                if (result && result.data) {
-                    console.log("Fetched destination data:", result.data); // Log data untuk debugging
-                    setFormData(result.data);
-                } else {
-                    setError("Data tidak tersedia atau tidak ditemukan.");
-                }
-            } catch (error) {
-                setError("Terjadi kesalahan saat mengambil data: " + error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const [oldImage, setOldImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-        fetchDestination();
-    }, [id]);
+  useEffect(() => {
+    setPageTitle('Edit Data Destinasi');
+  }, [setPageTitle]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({ ...prevState, [name]: value }));
-    };
+  const { data: destinationData, isLoading: isFetching } = useQuery({
+    queryKey: ['destination', slug],
+    queryFn: async ({ signal }) => {
+      const response = await fetchAPI(`/admin/destinations/${slug}`, { signal });
+      return response.data;
+    },
+    enabled: !!slug,
+  });
 
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        console.log("Submitting data:", formData); // Log data yang akan dikirim
-        
-        const formDataSubmit = new FormData();
-    Object.keys(formData).forEach(key => {
-            formDataSubmit.append(key, formData[key]);
-    });
+  useEffect(() => {
+    if (destinationData) {
+      setFormData({
+        name: destinationData.name || '',
+        location: destinationData.location || '',
+        description: destinationData.description || '',
+        image_url: null,
+      });
+      setOldImage(destinationData.image_url || null);
+      setImagePreview(null);
+    }
+  }, [destinationData]);
 
-        try {
-            const response = await fetch(`http://localhost:8000/api/admin/destinations/${id}`, {
-                method: "PUT",
-                body: formDataSubmit,
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Tampilkan alert sukses
-                alert('Destinasi Baru berhasil diubah');
-                // Redirect ke halaman data user
-                navigate('/data-destinasi');
-                console.log("Submitted Data:" + formData);
-            } else if (response.status === 422) {
-                setError(data);
-            } else {
-                setError(data.message || 'Destinasi Baru Gagal Ditambahkan');
-            }
-            alert('Data destinasi berhasil diubah');
-            navigate('/data-destinasi'); // Redirect ke halaman data destinasi
-        } catch (error) {
-            setError(error.message);
+  const updateDestinationMutation = useMutation({
+    mutationFn: (payload) =>
+      fetchAPI(`/admin/destinations/${slug}`, {
+        method: 'POST',
+        body: payload,
+      }),
+    onSuccess: (data) => {
+      navigate('/admin/destinations', {
+        state: { message: data.message },
+      });
+    },
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else if (error.status === 401) {
+          setError('Sesi Anda telah berakhir. Silakan login kembali.');
+        } else {
+          setError('Gagal mengubah data destinasi. Silakan coba lagi nanti.');
         }
-    };
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
 
-    if (loading) return (<p className="text-center mt-5">Sedang mengambil data destinasi berdasarkan ID...</p>);
-    if (error) return (<div className="alert alert-danger mt-5" role="alert">Error: {error}</div>);
+  const handleChange = (e) => {
+    const { name, type, value, files } = e.target;
+    if (type === 'file') {
+      const selectedFile = files[0];
+      setFormData((prev) => ({ ...prev, [name]: selectedFile }));
+      if (selectedFile) {
+        if (imagePreview) URL.revokeObjectURL(imagePreview);
+        setImagePreview(URL.createObjectURL(selectedFile));
+      } else {
+        setImagePreview(null);
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
-    return (
-        <div>
-            <NavbarAdmin />
-            <main className="container content-wrapper">
-                <a href="/data-destinasi" className="btn btn-secondary">Kembali ke Halaman Data Destinasi</a>
-                <h1 className="text-shadow">Edit Data Destinasi</h1>
-                <p className="text-shadow">Di halaman ini, kamu dapat mengubah data destinasi.</p>
-                <div className="card p-4">
-                    {/* Alert Bootstrap untuk menampilkan semua error validasi */}
-             {error && (
-                        <div className="alert alert-danger" role="alert">
-                            <ul>
-                                {/* Menampilkan error dari API di dalam list */}
-                                {Object.keys(error).map((key) => (
-                                    <li key={key}>{error[key][0]}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                    <form onSubmit={handleSubmit}>
-                        <div className="row">
-                            <div className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="name" className="form-label">Nama Destinasi</label>
-                                <input type="text" name="name" id="name" className="form-control" value={formData.name} onChange={handleChange} />
-                            </div>
-                            <div className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="slug" className="form-label">Slug</label>
-                                <input type="text" name="slug" id="slug" className="form-control" value={formData.slug} onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="location" className="form-label">Lokasi</label>
-                                <input name="location" id="location" className="form-control" value={formData.location} onChange={handleChange} />
-                            </div>
-                            <div className="col-sm-12 col-md-6 mb-3">
-                                <label htmlFor="description" className="form-label">Deskripsi</label>
-                                <textarea name="description" id="description" className="form-control" value={formData.description} onChange={handleChange}></textarea>
-                            </div>
-                        </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setValidationErrors({});
 
-                        <button type="submit" className="btn btn-primary mb-3">Ubah Destinasi</button>
-                    </form>
+    const formDataSubmit = new FormData();
+    formDataSubmit.append('_method', 'PUT');
+    formDataSubmit.append('name', formData.name);
+    formDataSubmit.append('location', formData.location);
+    formDataSubmit.append('description', formData.description || '');
+
+    if (formData.image_url) {
+      formDataSubmit.append('image_url', formData.image_url);
+    }
+
+    updateDestinationMutation.mutate(formDataSubmit);
+  };
+
+  return (
+    <div>
+      <a href="/admin/destinations" className="btn btn-secondary mb-2">
+        Kembali ke Halaman Data Destinasi
+      </a>
+      <div className="card p-4">
+        {error && (
+          <div className="alert alert-danger mb-4" role="alert">
+            {error}
+          </div>
+        )}
+        {isFetching ? (
+          <div className="placeholder-glow">
+            <div className="row">
+              <div className="col-sm-12 col-md-6 mb-3">
+                <div className="placeholder col-4 mb-2"></div>
+                <div className="placeholder col-12 py-3 rounded"></div>
+              </div>
+              <div className="col-sm-12 col-md-6 mb-3">
+                <div className="placeholder col-4 mb-2"></div>
+                <div className="placeholder col-12 py-3 rounded"></div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-sm-12 col-md-6 mb-3">
+                <div className="placeholder col-4 mb-2"></div>
+                <div className="placeholder col-12 py-4 rounded"></div>
+              </div>
+              <div className="col-sm-12 col-md-6 mb-3">
+                <div className="placeholder col-4 mb-2"></div>
+                <div className="placeholder col-12 py-3 rounded"></div>
+              </div>
+            </div>
+            <div className="placeholder col-2 py-3 rounded btn-primary mt-2"></div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="row">
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="name" className="form-label">
+                  Nama Destinasi
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  className={`form-control ${validationErrors.name ? 'is-invalid' : ''}`}
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+                {validationErrors.name && (
+                  <div className="invalid-feedback">{validationErrors.name[0]}</div>
+                )}
+              </div>
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="location" className="form-label">
+                  Lokasi
+                </label>
+                <input
+                  name="location"
+                  id="location"
+                  className={`form-control ${validationErrors.location ? 'is-invalid' : ''}`}
+                  value={formData.location}
+                  onChange={handleChange}
+                />
+                {validationErrors.location && (
+                  <div className="invalid-feedback">{validationErrors.location[0]}</div>
+                )}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="description" className="form-label">
+                  Deskripsi
+                </label>
+                <textarea
+                  name="description"
+                  id="description"
+                  className={`form-control ${validationErrors.description ? 'is-invalid' : ''}`}
+                  value={formData.description}
+                  onChange={handleChange}
+                ></textarea>
+                {validationErrors.description && (
+                  <div className="invalid-feedback">{validationErrors.description[0]}</div>
+                )}
+              </div>
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label htmlFor="gambar" className="form-label">
+                  Gambar (Opsional)
+                </label>
+                <input
+                  type="file"
+                  name="image_url"
+                  id="gambar"
+                  className={`form-control ${validationErrors.image_url ? 'is-invalid' : ''}`}
+                  onChange={handleChange}
+                />
+                {validationErrors.image_url && (
+                  <div className="invalid-feedback">{validationErrors.image_url[0]}</div>
+                )}
+              </div>
+              {(imagePreview || oldImage) && (
+                <div className="mb-3">
+                  <p className="text-muted d-block mb-1">
+                    {imagePreview ? 'Pratinjau Gambar Baru:' : 'Gambar Saat Ini:'}
+                  </p>
+                  <img
+                    src={imagePreview || oldImage}
+                    alt="Preview"
+                    className="img-thumbnail object-fit-cover"
+                    style={{ maxHeight: '120px', maxWidth: '200px' }}
+                  />
                 </div>
-            </main>
-            <Footer />
-        </div>
-    );
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary mb-3"
+              disabled={updateDestinationMutation.isPending}
+            >
+              {updateDestinationMutation.isPending ? 'Memproses...' : 'Simpan'}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
 };
 
-export default EditDataDestinasi;
+export default EditDestination;

@@ -1,125 +1,191 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+import { fetchAPI, APIError, getCsrfCookie } from '../../services/api';
+import { useMutation } from '@tanstack/react-query';
 
 const Register = () => {
-    // State untuk menyimpan nilai input form
-    const [formRegister, setFormRegister] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirm_password: ''
-    });
+  const [formRegister, setFormRegister] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirm_password: '',
+  });
 
-    // State untuk menyimpan pesan error per field
-    const [errors, setErrors] = useState({});
-    
-    // State untuk menyimpan error global atau sistem
-    const [error, setError] = useState(null);
-    
-    // Hook untuk navigasi ke halaman lain setelah sukses
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const { setPageTitle, setPageSubtitle } = useOutletContext();
 
-    // Fungsi untuk menangani perubahan input form
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        // Mengupdate state formRegister sesuai dengan input yang diubah
-        setFormRegister({ ...formRegister, [name]: value });
+  useEffect(() => {
+    setPageTitle('Register');
+    setPageSubtitle('Silakan masukkan nama, email, dan password untuk membuat akun baru.');
+  }, [setPageTitle, setPageSubtitle]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormRegister({ ...formRegister, [name]: value });
+  };
+
+  const registerMutation = useMutation({
+    mutationFn: async (payload) => {
+      await getCsrfCookie();
+
+      return fetchAPI('/register', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+
+    onSuccess: (response) => {
+      if (response?.success === true) {
+        const user = response.data.user;
+
+        localStorage.setItem('user', JSON.stringify(user));
+
+        navigate('/', {
+          state: { message: `Selamat datang, ${user?.name || 'Pengguna'}!` },
+        });
+      }
+    },
+
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else {
+          setError('Registrasi akun baru gagal, silakan coba lagi nanti.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setValidationErrors({});
+
+    const payload = {
+      name: formRegister.name,
+      email: formRegister.email,
+      password: formRegister.password,
+      confirm_password: formRegister.confirm_password,
     };
 
-    // Fungsi untuk menangani submit form
-    const handleSubmit = async (e) => {
-        e.preventDefault(); // Mencegah reload halaman
-        setError(null); // Reset error global
-        setErrors({}); // Reset error per field
+    registerMutation.mutate(payload);
 
-        // Membuat objek FormData untuk dikirimkan ke API
-        const formRegisSubmit = new FormData();
-        Object.keys(formRegister).forEach(key => {
-            formRegisSubmit.append(key, formRegister[key]);
-        });
+    // try {
+    //   setIsSubmitting(true);
+    //   const response = await fetchAPI('/register', {
+    //     method: 'POST',
+    //     body: JSON.stringify(payload),
+    //   });
+    //   const authData = response?.data;
+    //   if (response?.success) {
+    //     localStorage.setItem('token', authData.token);
+    //     if (authData?.token) {
+    //       localStorage.setItem('token', authData.token);
+    //       if (authData.user) {
+    //         localStorage.setItem('user', JSON.stringify(authData.user));
+    //       }
 
-        try {
-            // Mengirim request ke API untuk registrasi
-            const response = await fetch('http://localhost:8000/api/register', {
-                method: 'POST',
-                body: formRegisSubmit
-            });
+    //       navigate('/', {
+    //         state: { message: `Selamat datang, ${authData.user?.name || 'Pengguna'}!` },
+    //       });
+    //     } else {
+    //       navigate('/login', {
+    //         state: { message: response?.message },
+    //       });
+    //     }
+    //   }
+    // } catch (error) {}
+  };
 
-            const data = await response.json(); // Mengambil respons dari API
-
-            // Jika registrasi berhasil
-            if (response.ok && data.status === 'success') {
-                alert('Registrasi berhasil. Untuk saat ini, pengguna belum dapat melakukan login.'); // Menampilkan alert sukses
-                navigate('/'); // Navigasi ke halaman utama
-            } 
-            // Jika ada error validasi dari API (status 422)
-            else if (response.status === 422) {
-                setErrors(data); // Simpan error per field di state errors
-            } 
-            // Jika ada error lain
-            else {
-                setError(data.message || 'Registrasi Gagal'); // Simpan error global
-            }
-        } catch (error) {
-            setError('Terjadi Masalah Pada Sistem.'); // Error jika fetch gagal
-        }
-    }
-
-    return (
-        <div className="container mt-5" style={{ minHeight: "90vh" }}>
-            <Link to="/" className="btn btn-secondary">Kembali ke Halaman Utama</Link>
-            <h1 className="text-shadow">Register</h1>
-            <p className="text-shadow">Silakan masukkan nama, email, dan password untuk membuat akun baru.</p>
-            
-            {/* Alert Bootstrap untuk menampilkan semua error validasi */}
-            {Object.keys(errors).length > 0 && (
-                <div className="alert alert-danger" role="alert">
-                    <ul>
-                        {/* Menampilkan error dari API di dalam list */}
-                        {Object.keys(errors).map((key) => (
-                            <li key={key}>{errors[key][0]}</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
-            {/* Form Registrasi */}
-            <form onSubmit={handleSubmit} className="card p-3">
-                <div className="row">
-                    {/* Input untuk Nama */}
-                    <div className="col-sm-12 col-md-6 mb-3">
-                        <label for="nama_lengkap" className="form-label">Nama</label>
-                        <input type="text" name="name" id="nama_lengkap" className="form-control" value={formRegister.name} onChange={handleChange} autoFocus />
-                    </div>
-                    {/* Input untuk Email */}
-                    <div className="col-sm-12 col-md-6 mb-3">
-                        <label for="email" className="form-label">Email</label>
-                        <input type="email" name="email" id="email" className="form-control" value={formRegister.email} onChange={handleChange} />
-                    </div>
-                </div>
-                <div className="row">
-                    {/* Input untuk Password */}
-                    <div className="col-sm-12 col-md-6 mb-3">
-                        <label for="password" className="form-label">Kata Sandi</label>
-                        <input type="password" name="password" id="password" className="form-control" value={formRegister.password} onChange={handleChange} />
-                    </div>
-                    {/* Input untuk Konfirmasi Password */}
-                    <div className="col-sm-12 col-md-6 mb-3">
-                        <label for="confirm_password" className="form-label">Konfirmasi Kata Sandi</label>
-                        <input type="password" name="confirm_password" id="confirm_password" className="form-control" value={formRegister.confirm_password} onChange={handleChange} />
-                    </div>
-                </div>
-                <button type="submit" className="btn btn-primary">Daftar</button>
-                
-                {/* Menampilkan error global (jika ada) */}
-                {error && (
-                    <div className="alert alert-danger mt-3" role="alert">
-                        {error}
-                    </div>
-                )}
-            </form>
+  return (
+    <div>
+      {error && (
+        <div className="alert alert-danger mt-3" role="alert">
+          {error}
         </div>
-    );
-}
+      )}
+
+      <form onSubmit={handleSubmit} className="card p-3">
+        <div className="row">
+          <div className="col-sm-12 col-md-6 mb-3">
+            <label htmlFor="name" className="form-label">
+              Nama
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              className={`form-control ${validationErrors.name ? 'is-invalid' : ''}`}
+              value={formRegister.name}
+              onChange={handleChange}
+              autoFocus
+            />
+            {validationErrors.name && (
+              <div className="invalid-feedback">{validationErrors.name[0]}</div>
+            )}
+          </div>
+          <div className="col-sm-12 col-md-6 mb-3">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+              value={formRegister.email}
+              onChange={handleChange}
+            />
+            {validationErrors.email && (
+              <div className="invalid-feedback">{validationErrors.email[0]}</div>
+            )}
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-12 col-md-6 mb-3">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+              value={formRegister.password}
+              onChange={handleChange}
+            />
+            {validationErrors.password && (
+              <div className="invalid-feedback">{validationErrors.password[0]}</div>
+            )}
+          </div>
+          <div className="col-sm-12 col-md-6 mb-3">
+            <label htmlFor="confirm_password" className="form-label">
+              Konfirmasi Password
+            </label>
+            <input
+              type="password"
+              name="confirm_password"
+              id="confirm_password"
+              className={`form-control ${validationErrors.confirm_password ? 'is-invalid' : ''}`}
+              value={formRegister.confirm_password}
+              onChange={handleChange}
+            />
+            {validationErrors.confirm_password && (
+              <div className="invalid-feedback">{validationErrors.confirm_password[0]}</div>
+            )}
+          </div>
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? 'Memproses...' : 'Daftar'}
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default Register;
