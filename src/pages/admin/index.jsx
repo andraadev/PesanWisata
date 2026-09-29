@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
-const BerandaAdmin = () => {
+const Dashboard = () => {
   const { setPageTitle } = useOutletContext();
 
   useEffect(() => {
@@ -17,4 +17,4 @@ const BerandaAdmin = () => {
     </div>
   );
 };
-export default BerandaAdmin;
+export default Dashboard;
