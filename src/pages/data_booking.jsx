@@ -62,6 +62,14 @@ const DataBooking = () => {
 
             {!isLoading && isError && <TableError colSpan={4} onRetry={refetch} />}
 
+            {!isLoading && !isError && bookingData.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center py-4 text-muted">
+                  Belum ada reservasi.
+                </td>
+              </tr>
+            )}
+
             {!isLoading &&
               !isError &&
               bookingData.map((booking, no) => (
