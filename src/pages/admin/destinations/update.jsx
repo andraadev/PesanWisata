@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
 const EditDestination = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -26,12 +26,12 @@ const EditDestination = () => {
   }, [setPageTitle]);
 
   const { data: destinationData, isLoading: isFetching } = useQuery({
-    queryKey: ['destination', id],
+    queryKey: ['destination', slug],
     queryFn: async ({ signal }) => {
-      const response = await fetchAPI(`/admin/destinations/${id}`, { signal });
+      const response = await fetchAPI(`/admin/destinations/${slug}`, { signal });
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!slug,
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const EditDestination = () => {
 
   const updateDestinationMutation = useMutation({
     mutationFn: (payload) =>
-      fetchAPI(`/admin/destinations/${id}`, {
+      fetchAPI(`/admin/destinations/${slug}`, {
         method: 'POST',
         body: payload,
       }),

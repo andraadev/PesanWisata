@@ -44,7 +44,7 @@ function App() {
             <Route path="/admin/users/:id/edit" element={<EditUser />} />
             <Route path="/admin/destinations" element={<AdminDestinations />} />
             <Route path="/admin/destinations/create" element={<CreateDestination />} />
-            <Route path="/admin/destinations/:id/edit" element={<EditDestination />} />
+            <Route path="/admin/destinations/:slug/edit" element={<EditDestination />} />
             <Route path="/admin/bookings" element={<AdminBookings />} />
           </Route>
         </Route>
