@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useOutletContext } from 'react-router-dom';
-import { fetchAPI, APIError } from '../../services/api';
+import { fetchAPI, APIError, getCsrfCookie } from '../../services/api';
+import { useMutation } from '@tanstack/react-query';
 
 const Register = () => {
   const [formRegister, setFormRegister] = useState({
@@ -14,7 +15,6 @@ const Register = () => {
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const { setPageTitle, setPageSubtitle } = useOutletContext();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setPageTitle('Register');
@@ -25,6 +25,41 @@ const Register = () => {
     const { name, value } = e.target;
     setFormRegister({ ...formRegister, [name]: value });
   };
+
+  const registerMutation = useMutation({
+    mutationFn: async (payload) => {
+      await getCsrfCookie();
+
+      return fetchAPI('/register', {
+        method: 'POST',
+        body: payload,
+      });
+    },
+
+    onSuccess: (response) => {
+      if (response?.success === true) {
+        const user = response.data.user;
+
+        localStorage.setItem('user', JSON.stringify(user));
+
+        navigate('/', {
+          state: { message: `Selamat datang, ${user?.name || 'Pengguna'}!` },
+        });
+      }
+    },
+
+    onError: (error) => {
+      if (error instanceof APIError) {
+        if (error.status === 422) {
+          setValidationErrors(error.errors || {});
+        } else {
+          setError('Registrasi akun baru gagal, silakan coba lagi nanti.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
+      }
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,42 +73,33 @@ const Register = () => {
       confirm_password: formRegister.confirm_password,
     };
 
-    try {
-      setIsSubmitting(true);
-      const response = await fetchAPI('/register', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      const authData = response?.data;
-      if (response?.success) {
-        localStorage.setItem('token', authData.token);
-        if (authData?.token) {
-          localStorage.setItem('token', authData.token);
-          if (authData.user) {
-            localStorage.setItem('user', JSON.stringify(authData.user));
-          }
+    registerMutation.mutate(payload);
 
-          navigate('/', {
-            state: { message: `Selamat datang, ${authData.user?.name || 'Pengguna'}!` },
-          });
-        } else {
-          navigate('/login', {
-            state: { message: response?.message },
-          });
-        }
-      }
-    } catch (error) {
-      setIsSubmitting(false);
-      if (error instanceof APIError) {
-        if (error.status === 422) {
-          setValidationErrors(error.errors || {});
-        } else {
-          setError('Registrasi gagal, Silakan coba lagi nanti.');
-        }
-      } else {
-        setError('Tidak dapat terhubung ke server. Silakan coba lagi nanti.');
-      }
-    }
+    // try {
+    //   setIsSubmitting(true);
+    //   const response = await fetchAPI('/register', {
+    //     method: 'POST',
+    //     body: JSON.stringify(payload),
+    //   });
+    //   const authData = response?.data;
+    //   if (response?.success) {
+    //     localStorage.setItem('token', authData.token);
+    //     if (authData?.token) {
+    //       localStorage.setItem('token', authData.token);
+    //       if (authData.user) {
+    //         localStorage.setItem('user', JSON.stringify(authData.user));
+    //       }
+
+    //       navigate('/', {
+    //         state: { message: `Selamat datang, ${authData.user?.name || 'Pengguna'}!` },
+    //       });
+    //     } else {
+    //       navigate('/login', {
+    //         state: { message: response?.message },
+    //       });
+    //     }
+    //   }
+    // } catch (error) {}
   };
 
   return (
@@ -154,8 +180,8 @@ const Register = () => {
             )}
           </div>
         </div>
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-          {isSubmitting ? 'Memproses...' : 'Daftar'}
+        <button type="submit" className="btn btn-primary" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? 'Memproses...' : 'Daftar'}
         </button>
       </form>
     </div>
