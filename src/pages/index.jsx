@@ -54,7 +54,7 @@ const Home = () => {
           praktis dalam satu tempat.
         </p>
         <Link
-          to="/destinasi"
+          to="/destinations"
           className="cta-btn btn btn-lg bg-white text-dark rounded-pill"
           role="button"
         >
