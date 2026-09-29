@@ -100,7 +100,7 @@ const AdminDestinations = () => {
                     </td>
                     <td className="d-flex gap-2">
                       <Link
-                        to={`/admin/destinations/${destination.id}/edit`}
+                        to={`/admin/destinations/${destination.slug}/edit`}
                         className="btn btn-warning text-dark"
                       >
                         Edit
