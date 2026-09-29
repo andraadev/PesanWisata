@@ -6,7 +6,7 @@ import Notification from '../../../layouts/components/Notification';
 import TableSkeleton from '../../../layouts/components/TableSkeleton';
 import TableError from '../../../layouts/components/TableError';
 
-const DataUser = () => {
+const Users = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -66,7 +66,7 @@ const DataUser = () => {
       )}
       <div className="card">
         <div className="card-header">
-          <Link to="/admin/tambah-user" className="btn btn-primary">
+          <Link to="/admin/users/create" className="btn btn-primary">
             Tambah
           </Link>
         </div>
@@ -102,7 +102,7 @@ const DataUser = () => {
                     </td>
                     <td className="d-flex gap-2">
                       <Link
-                        to={`/admin/edit-user/${user.id}`}
+                        to={`/admin/users/${user.id}/edit`}
                         className="btn btn-warning text-dark"
                       >
                         Edit
@@ -126,4 +126,4 @@ const DataUser = () => {
   );
 };
 
-export default DataUser;
+export default Users;

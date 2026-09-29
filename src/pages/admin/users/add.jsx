@@ -3,7 +3,7 @@ import { useOutletContext, Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
-const TambahDataUser = () => {
+const CreateUser = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,7 +29,7 @@ const TambahDataUser = () => {
       }),
     onSuccess: (data) => {
       if (data.success) {
-        navigate('/admin/data-user', {
+        navigate('/admin/users', {
           state: { message: data.message },
         });
       }
@@ -70,7 +70,7 @@ const TambahDataUser = () => {
 
   return (
     <div>
-      <Link to="/admin/data-user" className="btn btn-secondary mb-3">
+      <Link to="/admin/users" className="btn btn-secondary mb-3">
         Kembali ke Halaman Data User
       </Link>
 
@@ -164,4 +164,4 @@ const TambahDataUser = () => {
   );
 };
 
-export default TambahDataUser;
+export default CreateUser;

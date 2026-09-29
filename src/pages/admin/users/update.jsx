@@ -49,7 +49,7 @@ const EditUser = () => {
       }),
 
     onSuccess: (data) => {
-      navigate('/admin/data-user', {
+      navigate('/admin/users', {
         state: { message: data.message },
       });
     },
@@ -92,7 +92,7 @@ const EditUser = () => {
 
   return (
     <div>
-      <Link to="/admin/data-user" className="btn btn-secondary mb-3">
+      <Link to="/admin/users" className="btn btn-secondary mb-3">
         Kembali ke Halaman Data User
       </Link>
 
