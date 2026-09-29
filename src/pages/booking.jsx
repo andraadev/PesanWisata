@@ -48,7 +48,7 @@ const Booking = () => {
       }),
     onSuccess: (data) => {
       if (data.success) {
-        navigate('/data-booking', {
+        navigate('/user/bookings', {
           state: { message: 'Booking berhasil ditambahkan' },
         });
       }
