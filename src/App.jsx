@@ -26,7 +26,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/destinasi" element={<DestinasiWisata />} />
 
-          <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute allowedRoles={['User']} />}>
             <Route path="/booking/:slug" element={<Booking />} />
             <Route path="/data-booking" element={<DataBooking />} />
           </Route>
