@@ -6,7 +6,7 @@ import TableSkeleton from '../layouts/components/TableSkeleton';
 import Notification from '../layouts/components/Notification';
 import TableError from '../layouts/components/TableError';
 
-const DataBooking = () => {
+const Bookings = () => {
   const { setPageTitle, setPageSubtitle } = useOutletContext();
 
   const navigate = useNavigate();
@@ -86,4 +86,4 @@ const DataBooking = () => {
     </div>
   );
 };
-export default DataBooking;
+export default Bookings;
