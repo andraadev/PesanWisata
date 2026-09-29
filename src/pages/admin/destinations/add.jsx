@@ -3,7 +3,7 @@ import { useOutletContext, Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
-const TambahDestinasi = () => {
+const CreateDestination = () => {
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -29,7 +29,7 @@ const TambahDestinasi = () => {
       }),
     onSuccess: (data) => {
       if (data?.success) {
-        navigate('/admin/data-destinasi', {
+        navigate('/admin/destinations', {
           state: { message: data.message },
         });
       }
@@ -92,7 +92,7 @@ const TambahDestinasi = () => {
   };
   return (
     <div>
-      <Link to="/admin/data-destinasi" className="btn btn-secondary mb-2">
+      <Link to="/admin/destinations" className="btn btn-secondary mb-2">
         Kembali ke Halaman Data Destinasi
       </Link>
 
@@ -195,4 +195,4 @@ const TambahDestinasi = () => {
   );
 };
 
-export default TambahDestinasi;
+export default CreateDestination;

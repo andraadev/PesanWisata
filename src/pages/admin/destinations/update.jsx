@@ -3,7 +3,7 @@ import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchAPI, APIError } from '../../../services/api';
 
-const EditDataDestinasi = () => {
+const EditDestination = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,7 +54,7 @@ const EditDataDestinasi = () => {
         body: payload,
       }),
     onSuccess: (data) => {
-      navigate('/admin/data-destinasi', {
+      navigate('/admin/destinations', {
         state: { message: data.message },
       });
     },
@@ -109,7 +109,7 @@ const EditDataDestinasi = () => {
 
   return (
     <div>
-      <a href="/admin/data-destinasi" className="btn btn-secondary mb-2">
+      <a href="/admin/destinations" className="btn btn-secondary mb-2">
         Kembali ke Halaman Data Destinasi
       </a>
       <div className="card p-4">
@@ -237,4 +237,4 @@ const EditDataDestinasi = () => {
   );
 };
 
-export default EditDataDestinasi;
+export default EditDestination;

@@ -6,7 +6,7 @@ import Notification from '../../../layouts/components/Notification';
 import TableSkeleton from '../../../layouts/components/TableSkeleton';
 import TableError from '../../../layouts/components/TableError';
 
-const DataDestinasi = () => {
+const AdminDestinations = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -66,7 +66,7 @@ const DataDestinasi = () => {
 
       <div className="card">
         <div className="card-header">
-          <Link to="/admin/tambah-destinasi" className="btn btn-primary">
+          <Link to="/admin/destinations/create" className="btn btn-primary">
             Tambah
           </Link>
         </div>
@@ -100,7 +100,7 @@ const DataDestinasi = () => {
                     </td>
                     <td className="d-flex gap-2">
                       <Link
-                        to={`/admin/edit-destinasi/${destination.id}`}
+                        to={`/admin/destinations/${destination.id}/edit`}
                         className="btn btn-warning text-dark"
                       >
                         Edit
@@ -124,4 +124,4 @@ const DataDestinasi = () => {
   );
 };
 
-export default DataDestinasi;
+export default AdminDestinations;
