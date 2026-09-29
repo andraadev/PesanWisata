@@ -35,7 +35,7 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(user));
 
         if (user?.role === 'Admin') {
-          navigate('/admin/beranda');
+          navigate('/admin/dashboard');
         } else {
           navigate('/');
         }
