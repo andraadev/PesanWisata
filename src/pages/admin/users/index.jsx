@@ -11,6 +11,7 @@ const Users = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [toastMessage, setToastMessage] = useState(null);
+  const [toastType, setToastType] = useState('success');
 
   const { setPageTitle, setPageSubtitle } = useOutletContext();
 
@@ -38,16 +39,19 @@ const Users = () => {
   const deleteMutation = useMutation({
     mutationFn: (id) => fetchAPI(`/admin/users/${id}`, { method: 'DELETE' }),
     onSuccess: (data) => {
+      setToastType('success');
       setToastMessage(data?.message || 'Data berhasil dihapus');
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
     onError: (err) => {
-      alert('Gagal menghapus data. Silakan coba beberapa saat lagi.');
+      setToastType('danger');
+      setToastMessage(err.message || 'Gagal menghapus data. Silakan coba beberapa saat lagi.');
     },
   });
 
   useEffect(() => {
     if (location.state?.message) {
+      setToastType('success');
       setToastMessage(location.state.message);
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -62,14 +66,20 @@ const Users = () => {
   return (
     <div>
       {toastMessage && (
-        <Notification message={toastMessage} onClose={() => setToastMessage(null)} />
+        <Notification
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
       )}
+
       <div className="card">
         <div className="card-header">
           <Link to="/admin/users/create" className="btn btn-primary">
             Tambah
           </Link>
         </div>
+
         <div className="card-body table-responsive">
           <table className="table table-bordered">
             <thead>
@@ -81,6 +91,7 @@ const Users = () => {
                 <th scope="col">Aksi</th>
               </tr>
             </thead>
+
             <tbody>
               {isLoading && <TableSkeleton columns={5} />}
 
@@ -107,6 +118,7 @@ const Users = () => {
                       >
                         Edit
                       </Link>
+
                       <button
                         type="button"
                         className="btn btn-danger"
