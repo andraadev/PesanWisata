@@ -42,7 +42,7 @@ const AdminDestinations = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => fetchAPI(`/admin/destinations/${id}`, { method: 'DELETE' }),
+    mutationFn: (slug) => fetchAPI(`/admin/destinations/${slug}`, { method: 'DELETE' }),
     onSuccess: (data) => {
       setToastMessage(data?.message || 'Data berhasil dihapus');
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
@@ -52,9 +52,9 @@ const AdminDestinations = () => {
     },
   });
 
-  function handleDelete(id) {
+  function handleDelete(slug) {
     if (window.confirm('Apakah anda yakin ingin menghapus data ini?')) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(slug);
     }
   }
 
@@ -108,7 +108,7 @@ const AdminDestinations = () => {
                       <button
                         type="button"
                         className="btn btn-danger"
-                        onClick={() => handleDelete(destination.id)}
+                        onClick={() => handleDelete(destination.slug)}
                         disabled={deleteMutation.isPending}
                       >
                         {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
